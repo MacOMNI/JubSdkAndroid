@@ -1,0 +1,45 @@
+{
+  "inputs": [
+    {
+      "amount": 500000000,
+      "bip32_path": {
+        "addressIndex": 0,
+        "change": false
+      }
+    },
+    {
+      "amount": 89892700,
+      "bip32_path": {
+        "addressIndex": 0,
+        "change": false
+      }
+    },
+    {
+      "amount": 31000000000,
+      "bip32_path": {
+        "addressIndex": 0,
+        "change": false
+      }
+    }
+  ],
+  "lock_time": 0,
+  "main_path": "m/44'/171'/0'",
+  "outputs": [
+    {
+      "bip32_path": {
+        "addressIndex": 0,
+        "change": false
+      },
+      "change_address": false
+    },
+    {
+      "bip32_path": {
+        "addressIndex": 0,
+        "change": false
+      },
+      "change_address": true
+    }
+  ],
+  "unsigned_trans": "0100000003f7e80ad9450efd38959897602165b0ee69494148614c7db4487a90cff50bd5470000000000fffffffff4c489519cb2e3cfa5f21780de2b1da142ddc56868770ef8bd244a82fb8fa6b00100000000ffffffff3e754f754b21b165fc9826204fe7f483e88e5cd186b80fe6ec2e7c3280a000b90000000000ffffffff0200f2052a0100000000001976a914de8c393df5c4868f2b2b2ae0b4a56753f30c47e788ace8bfdf300600000000001976a9149c9a77b85bbe817ee0bfb49a9160d23c394a685988ac0000000000000000030065cd1d0000000000000000ffffffff005ca75b050000000000000000ffffffff000076be370700000000000000ffffffff00",
+  "ver": "01000000"
+}

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="12dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_scan"
+            style="@style/button"
+            android:onClick="onClick"
+            android:text="连接" />
+
+        <TextView
+            android:id="@+id/text_state"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="11dp"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:textColor="@color/colorPrimaryDark"
+            android:focusable="true" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="指令存放在手机根目录下，以 jubiter_apdu.txt 命名,每行一条指令"/>
+
+        <Button
+            android:id="@+id/btn_send_apdu"
+            style="@style/button"
+            android:onClick="onClick"
+            android:text="指令发送" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="11dp"
+            android:background="@drawable/bg_log">
+
+            <TextView
+                android:id="@+id/log_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="11dp"
+                android:gravity="center"
+                android:text="@string/log"
+                android:textColor="@color/colorPrimary"
+                android:textSize="19sp" />
+
+            <ImageView
+                android:id="@+id/img_clear_log"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_margin="5dp"
+                android:clickable="true"
+                android:onClick="onClick"
+                android:padding="3dp"
+                android:src="@drawable/ic_delete_forever_blue_400_24dp" />
+
+
+            <ScrollView
+                android:id="@+id/scrollView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/log_title"
+                android:scrollbars="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_message"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp" />
+                </LinearLayout>
+            </ScrollView>
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

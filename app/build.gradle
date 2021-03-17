@@ -1,0 +1,82 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion "29.0.2"
+    defaultConfig {
+        applicationId "com.jubiter.sdk.demo"
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 2
+        versionName "1.1"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+
+        externalNativeBuild {
+            cmake {
+                cppFlags "",
+                        "-std=c++11",
+                        "-frtti",
+                        "-fexceptions",
+//                        "-DDEBUG",
+                        "-DHC",   // 启用HC代码
+//                        "-DJSON_HAS_INT64",  // JsonCpp
+                        "-DHAVE_ENDIAN_H"
+
+                arguments '-DANDROID_TOOLCHAIN=clang',      // 工具链更新，NDK 15c规定不再支持gcc，但gcc暂未移除，现项目改为clang工具链编译
+                        // 相关说明：https://developer.android.com/ndk/downloads/revision_history.html?hl=zh-cn
+                        "-DANDROID_STL=c++_static",      // 使用库: gnustl_static、stlport_static等，详见Android NDK官网。CMake默认使用 gnustl_static
+                        "-DANDROID_ARM_MODE=arm",            // 如果不添加，在编译 polarssl 库里 bignum 中的汇编时会报错 (*)
+                        "-DANDROID_PLATFORM=android-19"
+                // platform 最高只写19，最低允许14（NDK 15C规定），超过19编译出的库，在Android 5.0（API 21）以下会崩溃 (*)
+            }
+
+            ndk {
+                abiFilters "arm64-v8a",
+                           "armeabi-v7a"
+//                           "arm64-v8a"
+//                           "x86",
+//                           "x86_64"
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+//            version "3.10.2"
+        }
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.google.code.gson:gson:2.8.2'
+//    implementation 'io.grpc:grpc-okhttp:1.16.1'
+    // CURRENT_GRPC_VERSION
+//    implementation 'io.grpc:grpc-protobuf-lite:1.16.1'
+    // CURRENT_GRPC_VERSION
+//    implementation 'io.grpc:grpc-stub:1.16.1'
+    // CURRENT_GRPC_VERSION
+    implementation 'javax.annotation:javax.annotation-api:1.2'
+    implementation 'pub.devrel:easypermissions:1.2.0'
+    // release 依赖库
+    releaseImplementation files('libs/BTSDK_0204.jar')
+    // debug 依赖库
+//    debugImplementation files('libs/BTSDK_debug.jar')
+}

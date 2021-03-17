@@ -1,0 +1,7 @@
+{
+  "p2sh_segwit" : false,
+  "main_path" : "m/45'",
+  "m" : 2,
+  "n" : 3,
+  "cosigner" : ["xpub6913UHqdFEA64vWd24kaUJqQzYbTSGi2hE3iaWTSDbPXCPnmYLqndQQimUWdFwMLabrdCRguKpxHYV7f34ZVjTfWnpdW9MGkKZMxRmvxAPN","xpub685ZS5kT4EoUhFPnMyPNd5j17YVR1UNFKznkwrPrRVctuSdDZc4SmdW2MMfQV8cSks4zwmnb4N6QAoLTK9KfiGZbhER1FdbSX8dH3mPHpvC"]
+}

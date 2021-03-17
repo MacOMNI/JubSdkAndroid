@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/btn_scan"
+        style="@style/button"
+        android:onClick="onClick"
+        android:text="连接" />
+
+    <Button
+        android:id="@+id/btn_connect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="重连"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/text_state"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="11dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="onClick"
+        android:textColor="@color/colorPrimaryDark" />
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edit_apdu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="13dp"
+                    android:layout_weight="2.5"
+                    android:text="00D6FEED01" />
+
+                <Button
+                    android:id="@+id/btn_send_apdu"
+                    style="@style/button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="onClick"
+                    android:text="send apdu" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_fingerprint_manager"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="Fingerprint" />
+
+            <Button
+                android:id="@+id/btn_get_device_info"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="get_device_info" />
+
+            <Button
+                android:id="@+id/btn_applet"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="enum_applets" />
+
+            <Button
+                android:id="@+id/btn_set_time_out"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="set_time_out" />
+
+            <Button
+                android:id="@+id/btn_btc_getAddress"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="btc_get_address" />
+
+            <Button
+                android:id="@+id/btn_btc_getMainHDNode"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="btc_get_MainHDNode" />
+
+            <Button
+                android:id="@+id/btn_btc_show_address"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="btc_show_address" />
+
+            <Button
+                android:id="@+id/btn_btc_trans"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="btc_transaction" />
+
+            <Button
+                android:id="@+id/btn_btc_multisig_trans"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="BTC多重签名" />
+
+            <Button
+                android:id="@+id/btn_btc_usdt_trans"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="USDT 交易" />
+
+            <Button
+                android:id="@+id/btn_btc_set_my_address"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="btc_set_my_address" />
+
+            <Button
+                android:id="@+id/btn_qrc20_trans"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="qrc20_trans" />
+
+            <Button
+                android:id="@+id/btn_eth_trans"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="eth_transaction_test" />
+
+            <Button
+                android:id="@+id/btn_eth_erc20_trans"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="eth_erc20_transaction_test" />
+
+            <Button
+                android:id="@+id/btn_eth_showAddress"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="eth_show_address" />
+
+            <Button
+                android:id="@+id/btn_eth_getAddress"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="eth_get_address" />
+
+            <Button
+                android:id="@+id/btn_eth_getMainHDNode"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="eth_get_MainHDNode" />
+
+            <Button
+                android:id="@+id/btn_eth_build"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="ETH Build" />
+
+            <Button
+                android:id="@+id/btn_eth_contract"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="ETH Contract" />
+
+            <Button
+                android:id="@+id/btn_eth_transaction_UniswapV2Router02"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="eth_Transaction_UniswapV2Router02" />
+
+            <Button
+                android:id="@+id/btn_enum_support_coins"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="enum support coins" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#000"
+                android:layout_margin="5dp"/>
+            <Button
+                android:id="@+id/btn_hc_getAddress"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="hc getAddress" />
+
+            <Button
+                android:id="@+id/btn_hc_getMainHDNode"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="hc getMainHDNode" />
+
+            <Button
+                android:id="@+id/btn_hc_showAddress"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="hc showAddress" />
+
+            <Button
+                android:id="@+id/btn_hc_transaction"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="hc transaction" />
+
+            <Button
+                android:id="@+id/btn_eos_transaction"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="EOS transaction" />
+
+            <Button
+                android:id="@+id/btn_xrp_get_address"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="XRP GET ADDRESS" />
+
+            <Button
+                android:id="@+id/btn_xrp_transaction"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="XRP transaction" />
+            <Button
+                android:id="@+id/btn_trx"
+                style="@style/button"
+                android:onClick="onClick"
+                android:text="TRX" />
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>

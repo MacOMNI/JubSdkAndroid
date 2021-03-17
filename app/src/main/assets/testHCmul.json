@@ -1,0 +1,28 @@
+{
+  "inputs": [{
+    "amount": 500000,
+    "bip32_path": {
+      "addressIndex": 0,
+      "change": false
+    }
+  }],
+  "lock_time": 0,
+  "main_path": "m/45'",
+  "outputs": [{
+    "bip32_path": {
+      "addressIndex": 0,
+      "change": false
+    },
+    "change_address": false
+  }, {
+    "bip32_path": {
+      "addressIndex": 0,
+      "change": false
+    },
+    "change_address": true
+  }],
+  "p2sh-multisig": true,
+  "p2sh_segwit": false,
+  "unsigned_trans": "01000000015ce64233fe440f7363fa50896c1d50bd7fc9cdebf1405be4b1233388b14bbc830000000000ffffffff02a086010000000000000017a91445c39336e53276183b28cbf151da14d8defea1f0875c77040000000000000017a914ce68c6417fe50e69444d48e24b3a007a6ecd77f18700000000000000000120a107000000000000000000ffffffff00",
+  "ver": "01000000"
+}

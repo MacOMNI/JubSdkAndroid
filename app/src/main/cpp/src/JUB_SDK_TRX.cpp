@@ -1,0 +1,225 @@
+//
+//  JUB_SDK_TRX.cpp
+//  JubSDK
+//
+//  Created by Pan Min on 2020/12/13.
+//  Copyright © 2019 JuBiter. All rights reserved.
+//
+
+#include "JUB_SDK_TRX.h"
+
+#include "utility/util.h"
+
+#include "context/ContextTRX.h"
+#include "token/interface/TokenInterface.hpp"
+
+
+JUB_RV _allocMem(JUB_CHAR_PTR_PTR memPtr, const std::string &strBuf);
+
+/*****************************************************************************
+ * @function name : JUB_CreateContextTRX
+ * @in  param : cfg
+ *          : deviceID - device ID
+ * @out param : contextID
+ * @last change :
+ *****************************************************************************/
+JUB_RV JUB_CreateContextTRX(IN CONTEXT_CONFIG_TRX cfg,
+                            IN JUB_UINT16 deviceID,
+                            OUT JUB_UINT16* contextID) {
+
+    if (nullptr == jub::TokenManager::GetInstance()->GetOne(deviceID)) {
+        return JUBR_ARGUMENTS_BAD;
+    }
+
+    jub::ContextTRX* context = new jub::ContextTRX(cfg, deviceID);
+    *contextID = jub::ContextManager::GetInstance()->AddOne(context);
+    context->ActiveSelf();
+
+    return JUBR_OK;
+}
+
+/*****************************************************************************
+ * @function name : JUB_GetAddressTRX
+ * @in  param : contextID - context ID
+ *            : path
+ *            : bShow
+ * @out param : address
+ * @last change :
+ *****************************************************************************/
+JUB_RV JUB_GetAddressTRX(IN JUB_UINT16 contextID,
+                         IN BIP32_Path    path,
+                         IN JUB_ENUM_BOOL bShow,
+                         OUT JUB_CHAR_PTR_PTR address) {
+
+    JUB_CHECK_CONTEXT_TRX(contextID);
+
+    auto context = (jub::ContextTRX*)jub::ContextManager::GetInstance()->GetOne(contextID);
+    JUB_CHECK_NULL(context);
+
+    std::string str_address;
+    JUB_VERIFY_RV(context->GetAddress(path, bShow, str_address));
+    JUB_VERIFY_RV(_allocMem(address, str_address));
+
+    return JUBR_OK;
+}
+
+/*****************************************************************************
+ * @function name : JUB_SetMyAddressTRX
+ * @in  param : contextID - context ID
+ *            : path
+ * @out param : address
+ * @last change :
+ *****************************************************************************/
+JUB_RV JUB_SetMyAddressTRX(IN JUB_UINT16 contextID,
+                           IN BIP32_Path path,
+                           OUT JUB_CHAR_PTR_PTR address) {
+
+//    JUB_CHECK_CONTEXT_TRX(contextID);
+//
+//    auto context = (jub::ContextTRX*)jub::ContextManager::GetInstance()->GetOne(contextID);
+//    JUB_CHECK_NULL(context);
+//
+//    std::string str_address;
+//    JUB_VERIFY_RV(context->SetMyAddress(path, str_address));
+//    JUB_VERIFY_RV(_allocMem(address, str_address));
+
+    return JUBR_IMPL_NOT_SUPPORT;
+}
+
+/*****************************************************************************
+ * @function name : JUB_GetHDNodeTRX
+ * @in  param : contextID - context ID
+ *          : format - JUB_ENUM_PUB_FORMAT::HEX(0x00) for hex;
+ *                 JUB_ENUM_PUB_FORMAT::XPUB(0x01)
+ *          : path
+ * @out param : pubkey
+ * @last change :
+ *****************************************************************************/
+JUB_RV JUB_GetHDNodeTRX(IN JUB_UINT16 contextID,
+                        IN JUB_ENUM_PUB_FORMAT format,
+                        IN BIP32_Path path,
+                        OUT JUB_CHAR_PTR_PTR pubkey) {
+
+    JUB_CHECK_CONTEXT_TRX(contextID);
+
+    auto context = (jub::ContextTRX*)jub::ContextManager::GetInstance()->GetOne(contextID);
+    JUB_CHECK_NULL(context);
+
+    std::string str_pubkey;
+    JUB_VERIFY_RV(context->GetHDNode((JUB_BYTE)format, path, str_pubkey));
+    JUB_VERIFY_RV(_allocMem(pubkey, str_pubkey));
+
+    return JUBR_OK;
+}
+
+/*****************************************************************************
+ * @function name : JUB_GetMainHDNodeTRX
+ * @in  param : contextID - context ID
+ *          : format - JUB_ENUM_PUB_FORMAT::HEX(0x00) for hex;
+ *                 JUB_ENUM_PUB_FORMAT::XPUB(0x01)
+ * @out param : xpub
+ * @last change :
+ *****************************************************************************/
+JUB_RV JUB_GetMainHDNodeTRX(IN JUB_UINT16 contextID,
+                            IN JUB_ENUM_PUB_FORMAT format,
+                            OUT JUB_CHAR_PTR_PTR xpub) {
+
+    JUB_CHECK_CONTEXT_TRX(contextID);
+
+    auto context = (jub::ContextTRX*)jub::ContextManager::GetInstance()->GetOne(contextID);
+    JUB_CHECK_NULL(context);
+
+    std::string str_xpub;
+    JUB_VERIFY_RV(context->GetMainHDNode((JUB_BYTE)format, str_xpub));
+    JUB_VERIFY_RV(_allocMem(xpub, str_xpub));
+
+    return JUBR_OK;
+}
+
+/*****************************************************************************
+ * @function name : JUB_SignTransactionTRX
+ * @in  param : contextID - context ID
+ *          : path
+ *          : packedContractInPb - packed contract in protobuf
+ * @out param : rawInJSON - signed transaction raw in JSON
+ * @last change :
+ *****************************************************************************/
+JUB_COINCORE_DLL_EXPORT
+JUB_RV JUB_SignTransactionTRX(IN JUB_UINT16 contextID,
+                              IN BIP32_Path path,
+                              IN JUB_CHAR_CPTR packedContractInPb,
+                              OUT JUB_CHAR_PTR_PTR rawInJSON) {
+
+    JUB_CHECK_CONTEXT_TRX(contextID);
+
+    auto context = (jub::ContextTRX*)jub::ContextManager::GetInstance()->GetOne(contextID);
+    JUB_CHECK_NULL(context);
+
+    std::string str_raw;
+    JUB_VERIFY_RV(context->SignTransaction(path,
+                                           packedContractInPb,
+                                           str_raw));
+    JUB_VERIFY_RV(_allocMem(rawInJSON, str_raw));
+
+    return JUBR_OK;
+}
+
+
+/*****************************************************************************
+ * @function name : JUB_BuildTRC20Abi
+ * @in  param : contextID - context ID
+ *          : tokenName - TRX token name
+ *          : unitDP - unit decimal place
+ *          : contractAddress - contract address
+ *          : tokenTo - token to
+ *          : tokenValue - value for token transaction
+ * @out param : abi
+ * @last change :
+ *****************************************************************************/
+JUB_COINCORE_DLL_EXPORT
+JUB_RV JUB_BuildTRC20Abi(IN JUB_UINT16 contextID,
+                         IN JUB_CHAR_CPTR tokenName,
+                         IN JUB_UINT16 unitDP,
+                         IN JUB_CHAR_CPTR contractAddress,
+                         IN JUB_CHAR_CPTR tokenTo, IN JUB_CHAR_CPTR tokenValue,
+                         OUT JUB_CHAR_PTR_PTR abi) {
+
+    JUB_CHECK_CONTEXT_TRX(contextID);
+
+    auto context = (jub::ContextTRX*)jub::ContextManager::GetInstance()->GetOne(contextID);
+    JUB_CHECK_NULL(context);
+
+    JUB_VERIFY_RV(context->SetTRC20Token(tokenName, unitDP, contractAddress));
+
+    std::string strAbi;
+    JUB_VERIFY_RV(context->BuildTRC20Abi(tokenTo, tokenValue, strAbi));
+    JUB_VERIFY_RV(_allocMem(abi, strAbi));
+
+    return JUBR_OK;
+}
+
+
+/*****************************************************************************
+ * @function name : JUB_PackContractTRX
+ * @in  param : contextID - context ID
+ *          : tx - transaction
+ * @out param : packedContractInPB - packed contract in protobuf
+ * @last change :
+ *****************************************************************************/
+JUB_COINCORE_DLL_EXPORT
+JUB_RV JUB_PackContractTRX(IN JUB_UINT16 contextID,
+                           IN JUB_TX_TRX tx,
+                           OUT JUB_CHAR_PTR_PTR packedContractInPB) {
+
+    JUB_CHECK_CONTEXT_TRX(contextID);
+
+    auto context = (jub::ContextTRX*)jub::ContextManager::GetInstance()->GetOne(contextID);
+    JUB_CHECK_NULL(context);
+
+    std::string str_packcontract;
+    JUB_VERIFY_RV(context->PackTransactionRaw(tx,
+                                              str_packcontract));
+    JUB_VERIFY_RV(_allocMem(packedContractInPB, str_packcontract));
+
+    return JUBR_OK;
+}

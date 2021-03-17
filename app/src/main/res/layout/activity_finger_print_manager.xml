@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".FingerPrintManagerActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingBottom="7dp">
+
+        <Button
+            android:id="@+id/btn_enroll"
+            style="@style/button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onClick"
+            android:text="Enroll" />
+
+        <Button
+            android:id="@+id/btn_erase_all"
+            style="@style/button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onClick"
+            android:text="Erase All" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_verify"
+        style="@style/button"
+        android:onClick="onClick"
+        android:text="Nine Grids Verify " />
+
+    <ListView
+        android:id="@+id/list_finger"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="15dp"
+        android:layout_weight="1"
+        android:background="@drawable/bg_log"
+        android:padding="7dp" />
+
+    <Button
+        android:id="@+id/btn_trans"
+        style="@style/button"
+        android:onClick="onClick"
+        android:text="BTC Transfer Test for Bio" />
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="15dp"
+        android:layout_weight="1.2"
+        android:background="@drawable/bg_log">
+
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/txt_log"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </ScrollView>
+
+        <ImageView
+            android:id="@+id/delete"
+            android:layout_width="30dp"
+            android:layout_height="35dp"
+            android:layout_gravity="right"
+            android:clickable="true"
+            android:focusable="true"
+            android:onClick="onClick"
+            android:src="@drawable/ic_delete_forever_blue_400_24dp" />
+
+    </FrameLayout>
+
+
+</LinearLayout>

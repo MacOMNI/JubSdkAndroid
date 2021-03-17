@@ -1,0 +1,17 @@
+{
+  "EOS": {
+    "asset": "0.0100 EOS",
+    "bip32_path": {
+      "addressIndex": 0,
+      "change": false
+    },
+    "currency": "eosio.token",
+    "expiration": "900",
+    "from": "12guishiyong",
+    "memo": "wrrt",
+    "referenceBlockId": "05b564f76e336a05df8ade9ef923153e10aa3fd25efbeb06e8d0aac232cb2c09",
+    "referenceBlockTime": "1576745481",
+    "to": "hyperpaytech"
+  },
+  "main_path" : "m/44'/194'/0'"
+}

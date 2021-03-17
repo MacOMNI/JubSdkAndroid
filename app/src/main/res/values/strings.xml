@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">JubSDKLibTest</string>
+    <string name="log">运行日志</string>
+    <string name="default_apdu">000300000000000000;000300000000000000;000300000000000000</string>
+    <string name="title_activity_main3">Main3Activity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="edit_hint">多条指令以\" ; \"分割</string>
+
+    <string-array name="apdu">
+        <item>00A4040008D156000132832501</item>
+        <item>00A40400</item>
+        <!--<item>0029000000</item>-->
+        <!--<item>00F801000B010E08844C000000000000</item>-->
+        <item>00F80200120F100F6D2F3434272F30272F30272F302F31</item>
+        <!--<item>00F8030014101201010F6D2F3434272F30272F30272F302F30</item>-->
+    </string-array>
+</resources>

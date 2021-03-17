@@ -1,0 +1,207 @@
+//
+//  JUB_SDK_EOS.cpp
+//  JubSDK
+//
+//  Created by Pan Min on 2019/10/09.
+//  Copyright © 2019 JuBiter. All rights reserved.
+//
+
+#include "JUB_SDK_EOS.h"
+
+#include "utility/util.h"
+
+#include "context/ContextEOS.h"
+#include "token/interface/TokenInterface.hpp"
+
+
+JUB_RV _allocMem(JUB_CHAR_PTR_PTR memPtr, const std::string &strBuf);
+
+
+// stTransferAction::stTransferAction() {
+//     from = nullptr;
+//     to = nullptr;
+//     asset = nullptr;
+//     memo = nullptr;
+// }
+// 
+// 
+// stDelegateAction::stDelegateAction() {
+//     from = nullptr;
+//     receiver = nullptr;
+//     netQty = nullptr;
+//     cpuQty = nullptr;
+//     bStake = false;
+// }
+// 
+// 
+// stBuyRamAction::stBuyRamAction() {
+//     payer = nullptr;
+//     quant = nullptr;
+//     receiver = nullptr;
+// }
+// 
+// 
+// stSellRamAction::stSellRamAction() {
+//     account = nullptr;
+//     bytes = nullptr;
+// }
+// 
+// 
+// stActionEOS::stActionEOS() {
+//     type = JUB_ENUM_EOS_ACTION_TYPE::NS_ITEM_ACTION_TYPE;
+//     currency = nullptr;
+//     name = nullptr;
+
+//     transfer = stTransferAction();
+//     delegate = stDelegateAction();
+//     buyRam = stBuyRamAction();
+//     sellRam = stSellRamAction();
+// }
+
+
+/*****************************************************************************
+ * @function name : JUB_CreateContextEOS
+ * @in  param : cfg
+ *            : deviceID - device ID
+ * @out param : contextID
+ * @last change :
+ *****************************************************************************/
+JUB_RV JUB_CreateContextEOS(IN CONTEXT_CONFIG_EOS cfg,
+                            IN JUB_UINT16 deviceID,
+                            OUT JUB_UINT16* contextID) {
+
+    if (nullptr == jub::TokenManager::GetInstance()->GetOne(deviceID)) {
+        return JUBR_ARGUMENTS_BAD;
+    }
+
+    jub::ContextEOS* context = new jub::ContextEOS(cfg, deviceID);
+    *contextID = jub::ContextManager::GetInstance()->AddOne(context);
+    context->ActiveSelf();
+
+    return JUBR_OK;
+}
+
+
+/*****************************************************************************
+ * @function name : JUB_GetAddressEOS
+ * @in  param : contextID - context ID
+ *            : path
+ *            : bShow
+ * @out param : address
+ * @last change :
+ *****************************************************************************/
+JUB_RV JUB_GetAddressEOS(IN JUB_UINT16 contextID,
+                         IN BIP32_Path    path,
+                         IN JUB_ENUM_BOOL bShow,
+                         OUT JUB_CHAR_PTR_PTR address) {
+
+    JUB_CHECK_CONTEXT_EOS(contextID);
+
+    auto context = (jub::ContextEOS*)jub::ContextManager::GetInstance()->GetOne(contextID);
+    JUB_CHECK_NULL(context);
+
+    std::string str_address;
+    JUB_VERIFY_RV(context->GetAddress(path, bShow, str_address));
+    JUB_VERIFY_RV(_allocMem(address, str_address));
+
+    return JUBR_OK;
+}
+
+
+/*****************************************************************************
+ * @function name : JUB_SetMyAddressEOS
+ * @in  param : contextID - context ID
+ *            : path
+ * @out param : address
+ * @last change :
+ *****************************************************************************/
+JUB_RV JUB_SetMyAddressEOS(IN JUB_UINT16 contextID,
+                           IN BIP32_Path path,
+                           OUT JUB_CHAR_PTR_PTR address) {
+
+//    JUB_CHECK_CONTEXT_EOS(contextID);
+//
+//    auto context = (jub::ContextEOS*)jub::ContextManager::GetInstance()->GetOne(contextID);
+//    JUB_CHECK_NULL(context);
+//
+//    std::string str_address;
+//    JUB_VERIFY_RV(context->SetMyAddress(path, str_address));
+//    JUB_VERIFY_RV(_allocMem(address, str_address));
+
+    return JUBR_IMPL_NOT_SUPPORT;
+}
+
+
+/*****************************************************************************
+ * @function name : JUB_SignTransactionEOS
+ * @in  param : contextID - context ID
+ *          : path
+ *          : chainID - chain ID
+ *          : expiration - expiration, eg, 300(s)
+ *          : referenceBlockId   - reference block ID
+ *          : referenceBlockTime - reference block time
+ *          : actionsInJSON - array of actions
+ * @out param : rawInJSON
+ * @last change :
+ *****************************************************************************/
+JUB_COINCORE_DLL_EXPORT
+JUB_RV JUB_SignTransactionEOS(IN JUB_UINT16 contextID,
+                              IN BIP32_Path path,
+                              IN JUB_CHAR_PTR chainID,
+                              IN JUB_CHAR_PTR expiration,
+                              IN JUB_CHAR_PTR referenceBlockId,
+                              IN JUB_CHAR_PTR referenceBlockTime,
+                              IN JUB_CHAR_PTR actionsInJSON,
+                              OUT JUB_CHAR_PTR_PTR rawInJSON) {
+
+    JUB_CHECK_CONTEXT_EOS(contextID);
+
+    JUB_CHECK_NULL(expiration);
+    JUB_CHECK_NULL(referenceBlockId);
+    JUB_CHECK_NULL(referenceBlockTime);
+    JUB_CHECK_NULL(actionsInJSON);
+
+    auto context = (jub::ContextEOS*)jub::ContextManager::GetInstance()->GetOne(contextID);
+    JUB_CHECK_NULL(context);
+
+    std::string str_raw;
+    JUB_VERIFY_RV(context->SignTransaction(path,
+                                           chainID,
+                                           expiration,
+                                           referenceBlockId,
+                                           referenceBlockTime,
+                                           actionsInJSON,
+                                           str_raw));
+    JUB_VERIFY_RV(_allocMem(rawInJSON, str_raw));
+
+    return JUBR_OK;
+}
+
+
+/*****************************************************************************
+ * @function name : JUB_BuildActionEOS
+ * @in  param : contextID - context ID
+ *          : actions - action array
+ *          : actionCount - the count of action array
+ * @out param : actionsInJSON
+ * @last change :
+ *****************************************************************************/
+JUB_COINCORE_DLL_EXPORT
+JUB_RV JUB_BuildActionEOS(IN JUB_UINT16 contextID,
+                          IN JUB_ACTION_EOS_PTR actions,
+                          IN JUB_UINT16 actionCount,
+                          OUT JUB_CHAR_PTR_PTR actionsInJSON) {
+
+    JUB_CHECK_CONTEXT_EOS(contextID);
+
+    auto context = (jub::ContextEOS*)jub::ContextManager::GetInstance()->GetOne(contextID);
+    JUB_CHECK_NULL(context);
+
+    std::string str_actions;
+    JUB_VERIFY_RV(context->BuildAction(actions,
+                                       actionCount,
+                                       str_actions));
+    JUB_VERIFY_RV(_allocMem(actionsInJSON, str_actions));
+
+    return JUBR_OK;
+}

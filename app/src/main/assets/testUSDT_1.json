@@ -1,0 +1,31 @@
+{
+  "USDT_amount": 10000,
+  "USDT_to": "1FQ6Sv1yDi6AnC8n8BQnLLNAaQ1esGT5oN",
+  "inputs": [
+    {
+      "amount": 50446,
+      "bip32_path": {
+        "addressIndex": 0,
+        "change": false
+      },
+      "preHash": "b6fb5826fb42cc583699cc90140ad9180efedcad17be9a79eef36c7d38d97e9d",
+      "preIndex": 1
+    }
+  ],
+  "lock_time": 0,
+  "outputs": [
+    {
+      "address": "1JpuFuiBfMzm99JzZG4rpZexxjortaH42t",
+      "amount": 30446,
+      "bip32_path": {
+        "addressIndex": 0,
+        "change": false
+      },
+      "change_address": true
+    }
+  ],
+  "ver": "01000000",
+  "coin_type": 3,
+  "main_path" : "m/44'/0'/0'",
+  "p2sh_segwit": false
+}

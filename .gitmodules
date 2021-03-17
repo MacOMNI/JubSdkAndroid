@@ -1,0 +1,3 @@
+[submodule "app/src/main/cpp/deps/protobuf"]
+	path = app/src/main/cpp/deps/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git

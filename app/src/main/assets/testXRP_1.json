@@ -1,0 +1,27 @@
+{
+  "main_path" : "m/44'/144'/0'",
+  "XRP": {
+    "account": "rGjMFWKpAqFxkdfRWXuBPVKvGo2PZQdYkv",
+    "bip32_path": {
+      "addressIndex": 0,
+      "change": false
+    },
+    "fee": "10",
+    "flags": "0",
+    "lastLedgerSequence": "0",
+    "memos": {
+      "memoData": "ertyyy",
+      "memoType": "client"
+    },
+    "sequence": "148",
+    "0": {
+      "amount": {
+        "value": "1000"
+      },
+      "destination": "ruhDsG298KQorsMnXXGDvJJFBLegsq6Hb",
+      "destinationTag": "0",
+      "type": 0
+    },
+    "type": 0
+  }
+}
