@@ -102,6 +102,9 @@ JUB_RV JubiterBLDImpl::SignTXTRX(const std::vector<JUB_BYTE>& vPath,
     try {
         TW::Tron::Transaction tx;
         tx.raw_data.deserialize(vRaw);
+        if (0 >= tx.raw_data.contracts.size()) {
+            return JUBR_ARGUMENTS_BAD;
+        }
 
         uint16_t total = 0;
         // pathTLV
