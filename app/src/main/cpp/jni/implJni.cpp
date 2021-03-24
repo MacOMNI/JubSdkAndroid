@@ -2224,11 +2224,11 @@ JNIEXPORT jstring JNICALL native_TRXBuildTRC20Abi(JNIEnv *env, jclass obj, jlong
     Json::Value root;
     reader.parse(pJSON, root);
 
-    char *token_to = (char *) root["TRX20"]["token_to"].asCString();
-    char *token_value = (char *) root["TRX20"]["token_value"].asCString();
-    char *tokenName = (char *) root["TRX20Token"]["tokenName"].asCString();
-    uint16_t unitDP = root["TRX20Token"]["dp"].asDouble();
-    char *contractAddress = (char *) root["TRX20Token"]["contract_address"].asCString();
+    char *token_to = (char *) root["TRC20"]["token_to"].asCString();
+    char *token_value = (char *) root["TRC20"]["token_value"].asCString();
+    char *tokenName = (char *) root["TRC20"]["tokenName"].asCString();
+    uint16_t unitDP = root["TRC20"]["dp"].asDouble();
+    char *contractAddress = (char *) root["TRC20"]["contract_address"].asCString();
 
 
     char *abi = nullptr;
