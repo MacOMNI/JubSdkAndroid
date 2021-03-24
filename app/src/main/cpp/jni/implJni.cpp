@@ -2217,7 +2217,7 @@ native_TRXTransaction(JNIEnv *env, jclass obj, jlong contextID, jstring jJSON, j
 }
 
 JNIEXPORT jstring JNICALL native_TRXBuildTRC20Abi(JNIEnv *env, jclass obj, jlong contextID,
-                                                   jstring jJSON) {
+                                                  jstring jJSON) {
     JUB_CHAR_PTR pJSON = const_cast<JUB_CHAR_PTR>(env->GetStringUTFChars(jJSON, NULL));
 
     Json::Reader reader;
@@ -2233,15 +2233,37 @@ JNIEXPORT jstring JNICALL native_TRXBuildTRC20Abi(JNIEnv *env, jclass obj, jlong
 
     char *abi = nullptr;
     JUB_RV rv = JUB_BuildTRC20Abi(contextID, tokenName, unitDP, contractAddress, token_to,
-                                     token_value, &abi);
+                                  token_value, &abi);
+
+    env->ReleaseStringUTFChars(jJSON, pJSON);
     if (rv != JUBR_OK) {
-        LOG_ERR("JUB_BuildTRC20AbiETH: %08x", rv);
-        env->ReleaseStringUTFChars(jJSON, pJSON);
+        LOG_ERR("JUB_BuildTRC20Abi: %08x", rv);
         return NULL;
     }
     jstring rawString = env->NewStringUTF(abi);
     JUB_FreeMemory(abi);
     return rawString;
+}
+
+JNIEXPORT jint JNICALL native_TRXSetTRC10Asset(JNIEnv *env, jclass obj, jlong contextID,
+                                                   jstring jJSON) {
+    JUB_CHAR_PTR pJSON = const_cast<JUB_CHAR_PTR>(env->GetStringUTFChars(jJSON, NULL));
+
+    Json::Reader reader;
+    Json::Value root;
+    reader.parse(pJSON, root);
+
+    char *assetName = (char *) root["TRC10"]["assetName"].asCString();
+    uint16_t unitDP = root["TRC10"]["dp"].asDouble();
+    char *assetID = (char *) root["TRC10"]["assetID"].asCString();
+
+    JUB_RV rv = JUB_SetTRC10Asset(contextID, assetName, unitDP, assetID);
+
+    env->ReleaseStringUTFChars(jJSON, pJSON);
+    if (rv != JUBR_OK) {
+        LOG_ERR("JUB_SetTRC10Asset: %08x", rv);
+    }
+    return rv;
 }
 
 JNIEXPORT jbyteArray JNICALL
@@ -2824,6 +2846,11 @@ static JNINativeMethod gMethods[] = {
                 "nativeTRXBuildTRC20Abi",
                 "(JLjava/lang/String;)Ljava/lang/String;",
                 (void *) native_TRXBuildTRC20Abi
+        },
+        {
+                "nativeTRXSetTRC10Asset",
+                "(JLjava/lang/String;)I",
+                (void *) native_TRXSetTRC10Asset
         },
         {
                 "nativeTRXPackContract",

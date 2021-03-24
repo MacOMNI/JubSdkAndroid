@@ -252,6 +252,8 @@ public class NativeApi {
 
     public static native String nativeTRXBuildTRC20Abi(long contextID, String json);
 
+    public static native int nativeTRXSetTRC10Asset(long contextID, String json);
+
     public static native byte[] nativeTRXPackContract(long contextID, String json);
 
     //*********************************** bio **********************************************
