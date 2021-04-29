@@ -44,9 +44,6 @@ typedef struct _stAppInfos_ {
 } stAppInfos;
 
 
-#define PREFIX_HPY  "hpy"
-#define PREFIX_MWH  "mw"
-
 class JubiterBLDImpl : public CommonTokenInterface,
                        public ETHTokenInterface,
                        public HCTokenInterface,
@@ -65,8 +62,11 @@ public:
 
         JUB_ENUM_BOOL b = JUB_ENUM_BOOL::BOOL_FALSE;
 
-        if (   0 == std::string((char*)devName).find(PREFIX_HPY)
-            || 0 == std::string((char*)devName).find(PREFIX_MWH)
+        if (   0 == std::string((char*)devName).find("JuBiter")
+            || 0 == std::string((char*)devName).find("hpy")
+            || 0 == std::string((char*)devName).find("HPY")
+            || 0 == std::string((char*)devName).find("mw")
+            || 0 == std::string((char*)devName).find("MW")
             ) {
             b = JUB_ENUM_BOOL::BOOL_TRUE;
         }
