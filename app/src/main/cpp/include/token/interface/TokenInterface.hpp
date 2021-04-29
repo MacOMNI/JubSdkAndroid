@@ -13,6 +13,7 @@
 #include "EOSTokenInterface.hpp"
 #include "XRPTokenInterface.hpp"
 #include "TRXTokenInterface.hpp"
+#include "FILTokenInterface.hpp"
 
 namespace jub {
 

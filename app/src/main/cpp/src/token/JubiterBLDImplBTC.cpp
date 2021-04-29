@@ -11,10 +11,6 @@ constexpr JUB_BYTE kMainnetP2SH_P2WPKH = 0x04;
 
 constexpr JUB_BYTE kMainnetP2SH_Multisig = 0x11;
 
-constexpr JUB_BYTE PKIAID_BTC[16] = {
-    0xD1, 0x56, 0x00, 0x01, 0x32, 0x83, 0x00, 0x42, 0x4C, 0x44, 0x00, 0x00, 0x42, 0x54, 0x43, 0x01
-};
-
 #define APPLET_BTC_SUPPORT_LEGACY_ADDRESS_VERSION "01090205"
 
 bool JubiterBLDImpl::_isSupportLegacyAddress() {
@@ -35,7 +31,7 @@ JUB_BYTE JubiterBLDImpl::_RealAddressFormat(const JUB_ENUM_BTC_ADDRESS_FORMAT& a
 
 #define SWITCH_TO_BTC_APP                       \
 do {				                            \
-    JUB_VERIFY_RV(_SelectApp(PKIAID_BTC, sizeof(PKIAID_BTC)/sizeof(JUB_BYTE)));  \
+    JUB_VERIFY_RV(_SelectApp(kPKIAID_BTC, sizeof(kPKIAID_BTC)/sizeof(JUB_BYTE)));\
 } while (0)                                     \
 
 JUB_RV JubiterBLDImpl::SelectAppletBTC() {

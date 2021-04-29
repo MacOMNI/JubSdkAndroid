@@ -15,6 +15,9 @@ namespace jub {
 class JubiterBLDBioImpl
 : public JubiterBLDImpl {
 public:
+    static stAppInfos g_appInfo[];
+
+public:
     JubiterBLDBioImpl(std::string path);
     JubiterBLDBioImpl(DeviceType* device);
     ~JubiterBLDBioImpl();

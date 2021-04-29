@@ -256,6 +256,20 @@ public class NativeApi {
 
     public static native byte[] nativeTRXPackContract(long contextID, String json);
 
+    //*********************************** FIL **********************************************
+
+    public static native int nativeFILCreateContext(int[] contextIDs, String json, long deviceHandle);
+
+    public static native String nativeFILShowAddress(long contextID, int change, int index);
+
+    public static native String nativeFILGetAddress(long contextID, int change, int index);
+
+    public static native String nativeFILGetHDNode(long contextID, int change, int index, boolean useHex);
+
+    public static native String nativeFILSetMyAddress(long contextID, int change, int index);
+
+    public static native String nativeFILTransaction(long contextID, String json);
+
     //*********************************** bio **********************************************
 
     public static native int nativeIdentityVerifyPIN(long deviceHandle, int mode, String pin, long[] retryTimes);

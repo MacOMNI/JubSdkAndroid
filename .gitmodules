@@ -1,3 +1,6 @@
 [submodule "app/src/main/cpp/deps/protobuf"]
 	path = app/src/main/cpp/deps/protobuf
 	url = https://github.com/protocolbuffers/protobuf.git
+[submodule "app/src/main/cpp/deps/uint256_t"]
+	path = app/src/main/cpp/deps/uint256_t
+	url = https://github.com/calccrypto/uint256_t.git

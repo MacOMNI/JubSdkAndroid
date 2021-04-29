@@ -10,6 +10,22 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <algorithm>
+
+/*
+ * Nullability qualifiers: currently only supported by Clang.
+ */
+#if !(defined(__clang__) /*&& __has_feature(nullability)*/)
+#define    _Nonnull
+#define    _Nullable
+#define    _Null_unspecified
+#define    __NULLABILITY_PRAGMA_PUSH
+#define    __NULLABILITY_PRAGMA_POP
+#else
+#define    __NULLABILITY_PRAGMA_PUSH _Pragma("clang diagnostic push")    \
+    _Pragma("clang diagnostic ignored \"-Wnullability-completeness\"")
+#define    __NULLABILITY_PRAGMA_POP _Pragma("clang diagnostic pop")
+#endif
 
 namespace TW {
 
@@ -380,4 +396,19 @@ inline uint64_t decode64BE(const uint8_t* _Nonnull src) {
     // clang-format on
 }
 
+// JuBiter-defined
+/// Encodes a 64-bit big-endian value into the provided buffer.
+template<typename T>
+std::vector<uint8_t> encodeBENoZero(T value) {
+    std::vector<uint8_t> data;
+    do {
+        uint8_t v = value%256;
+        // push v
+        data.push_back(v);
+        value /= 256;
+    } while(value > 0);
+    std::reverse(data.begin(), data.end());
+
+    return data;
+}
 } // namespace TW

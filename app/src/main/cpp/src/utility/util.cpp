@@ -54,7 +54,7 @@ std::string DecStringToHexString(std::string str) {
     return bigUnsignedToString(stringToBigUnsigned(str.c_str()), 16);
 }
 
-std::string numberToHexString(unsigned int val) {
+std::string numberToHexString(unsigned long val) {
 
     return bigUnsignedToString(val, 16);
 }

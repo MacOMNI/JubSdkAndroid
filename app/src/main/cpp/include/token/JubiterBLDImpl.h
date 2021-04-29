@@ -25,9 +25,31 @@ constexpr JUB_BYTE kPKIAID_FIDO[8] = {
     0xa0, 0x00,	0x00, 0x06, 0x47, 0x2f, 0x00, 0x01
 };
 
+constexpr JUB_BYTE kPKIAID_BTC[16] = {
+    0xD1, 0x56, 0x00, 0x01, 0x32, 0x83, 0x00, 0x42, 0x4C, 0x44, 0x00, 0x00, 0x42, 0x54, 0x43, 0x01
+};
+
+constexpr JUB_BYTE kPKIAID_HC[14] = {
+    0x63, 0x6F, 0x6D, 0x2E, 0x66, 0x74, 0x2E, 0x68, 0x63, 0x72, 0x61, 0x73, 0x68, 0x01
+};
+
+constexpr JUB_BYTE kPKIAID_ETH[16] = {
+    0xD1, 0x56, 0x00, 0x01, 0x32, 0x83, 0x00, 0x42, 0x4C, 0x44, 0x00, 0x00, 0x45, 0x54, 0x48, 0x01
+};
+
+constexpr JUB_BYTE kPKIAID_EOS[16] = {
+    0xD1, 0x56, 0x00, 0x01, 0x32, 0x03, 0x00, 0x42, 0x4C, 0x44, 0x00, 0x00, 0x45, 0x54, 0x49, 0x01
+};
+
 constexpr JUB_BYTE kPKIAID_MISC[16] = {
     0xD1, 0x56, 0x00, 0x01, 0x32, 0x03, 0x00, 0x42, 0x4C, 0x44, 0x00, 0x6D, 0x69, 0x73, 0x63, 0x01
 };
+
+typedef enum class enumCoinTypeETH {
+    COINETH = 0x00,
+    COINFIL = 0x01,
+    Default = COINETH
+} JUB_ENUM_COINTYPE_ETH;
 
 typedef enum class enumCoinTypeMisc {
     COIN = 0x00,
@@ -50,10 +72,14 @@ typedef struct _stAppInfos_ {
 class JubiterBLDImpl : public CommonTokenInterface,
                        public ETHTokenInterface,
                        public HCTokenInterface,
-	                   public EOSTokenInterface,
+                       public EOSTokenInterface,
+                       public XRPTokenInterface,
                        public TRXTokenInterface,
-                       public XRPTokenInterface
+                       public FILTokenInterface
 {
+public:
+    static stAppInfos g_appInfo[];
+
 public:
     JubiterBLDImpl(std::string path);
     JubiterBLDImpl(DeviceType* device);
@@ -187,6 +213,22 @@ public:
                                  const JUB_UINT16 unitDP,
                                  const std::string& contractAddress) override;
 
+    //FIL functions
+    virtual JUB_RV SelectAppletFIL() override;
+    virtual JUB_RV SetCoinTypeFIL() override;
+    virtual JUB_RV GetAppletVersionFIL(std::string& version) override;
+    virtual JUB_RV GetAddressFIL(const std::string& path, const JUB_UINT16 tag, std::string& address) override;
+    virtual JUB_RV GetHDNodeFIL(const JUB_BYTE format, const std::string& path, std::string& pubkey) override;
+    virtual JUB_RV SignTXFIL(const uint64_t& nonce,
+                             const uint256_t& glimit,
+                             const uint256_t& gfeeCap,
+                             const uint256_t& gpremium,
+                             const std::string& to,
+                             const uint256_t& value,
+                             const std::string& input,
+                             const std::string& path,
+                             std::vector<uchar_vector>& vSignatureRaw) override;
+
     //common token functions
     virtual JUB_RV QueryBattery(JUB_BYTE &percent) override;
     virtual JUB_RV ShowVirtualPwd() override;
@@ -230,8 +272,6 @@ public:
     std::string getPath() {
         return _path;
     }
-
-    static stAppInfos g_appInfo[];
 
 protected:
     JUB_RV _SelectApp(const JUB_BYTE PKIAID[],
