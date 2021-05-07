@@ -5,10 +5,6 @@
 #include "JubiterBLDImpl.h"
 
 
-#define PREFIX_HPYG2  "hpy2"
-#define PREFIX_MWHG2   "mw2"
-
-
 namespace jub {
 
 
@@ -29,8 +25,11 @@ public:
 
         JUB_ENUM_BOOL b = JUB_ENUM_BOOL::BOOL_FALSE;
 
-        if (   0 == std::string((char*)devName).find(PREFIX_HPYG2)
-            || 0 == std::string((char*)devName).find(PREFIX_MWHG2)
+        if (   0 == std::string((char*)devName).find("JuBio")
+            || 0 == std::string((char*)devName).find("hpy2")
+            || 0 == std::string((char*)devName).find("HPYG2")
+            || 0 == std::string((char*)devName).find("mw2")
+            || 0 == std::string((char*)devName).find("MWG2")
             ) {
             b = JUB_ENUM_BOOL::BOOL_TRUE;
         }
