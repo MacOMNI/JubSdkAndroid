@@ -90,7 +90,7 @@ JUB_RV serializeTx(const std::vector<JUB_BYTE>& vNonce,
                    const std::vector<JUB_BYTE>& vSignature,
                    std::vector<JUB_BYTE>& raw) {
 
-    if (65 != vSignature.size()) {
+    if (0 == vSignature.size()) {
         return JUBR_ARGUMENTS_BAD;
     }
 
@@ -109,7 +109,7 @@ JUB_RV serializeTx(const std::vector<JUB_BYTE>& vNonce,
     std::copy(vSignature.begin()+32, vSignature.begin()+32+32, s.begin());
 //    tx.s = TW::uint256_t(s);
 
-    uchar_vector v(1);
+    uchar_vector v(vSignature.size()-32-32);
     std::copy(vSignature.begin()+32+32, vSignature.end(), v.begin());
 //    tx.v = TW::uint256_t(v);
 //

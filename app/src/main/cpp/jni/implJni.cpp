@@ -872,9 +872,9 @@ native_ETHCreateContext(JNIEnv *env, jclass obj, jintArray jContextId, jstring j
     cfg.chainID = root[CHAIN_ID].asInt();
     int rv = JUB_CreateContextETH(cfg, static_cast<JUB_UINT16>(deviceInfo), pContextID);
     if (rv != JUBR_OK) {
-        LOG_ERR("JUB_GetAddressETH: %08x", rv);
+        LOG_ERR("JUB_CreateContextETH: %08x", rv);
     } else {
-        LOG_INF("JUB_GetAddressETH: %d", *pContextID);
+        LOG_INF("JUB_CreateContextETH: %d", *pContextID);
     }
     env->ReleaseIntArrayElements(jContextId, (jint *) pContextID, FALSE);
     return rv;
