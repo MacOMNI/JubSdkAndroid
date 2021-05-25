@@ -108,8 +108,7 @@ JUB_RV ContextTRX::SignTransaction(const BIP32_Path& path,
         tx.raw_data.deserialize(vRaw);
         tx.signature = vSignatureRaw[0];
 
-        // must do verification for calculating the TXID and assign the value
-//#if defined(DEBUG)
+#if defined(DEBUG)
         //verify
         std::string pubkey;
         JUB_VERIFY_RV(token->GetHDNodeTRX(JUB_ENUM_PUB_FORMAT::HEX, strPath, pubkey));
@@ -119,7 +118,7 @@ JUB_RV ContextTRX::SignTransaction(const BIP32_Path& path,
                            tx)) {
             return JUBR_VERIFY_SIGN_FAILED;
         }
-//#endif
+#endif
 
         rawInJSON = tx.serialize().dump();
     }

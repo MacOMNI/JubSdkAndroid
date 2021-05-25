@@ -40,6 +40,7 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/../trezor-crypto/src/sodium SRC
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/../trezor-crypto/src/sodium/private SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/../trezor-crypto/src/sodium/private/fe_25_5 SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/../trezor-crypto/src/chacha20poly1305 SRC_LIST)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/uint256_t SRC_LIST)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
@@ -68,6 +69,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../deps/TrustWallet/wallet-core/
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../deps/TrustWallet/wallet-core/src/proto/Tron/protocol/core/contract)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../deps/TrustWallet/wallet-core)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../trezor-crypto/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../deps/uint256_t)
 
 ADD_DEFINITIONS(-DTARGET_OS_IPHONE=1)
 #add_compile_definitions(TARGET_OS_IPHONE=1)

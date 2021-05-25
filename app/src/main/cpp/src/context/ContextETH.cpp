@@ -7,6 +7,8 @@
 #include "TrustWallet/wallet-core/src/Hash.h"
 #include "TrezorCrypto/ecdsa.h"
 #include "TrezorCrypto/secp256k1.h"
+#include "TrustWallet/wallet-core/src/BinaryCoding.h"
+#include <uint256_t/uint256_t.h>
 
 namespace jub {
 
@@ -253,20 +255,34 @@ JUB_RV ContextETH::SignContract(const BIP32_Path& path,
         return JUBR_ARGUMENTS_BAD;
     }
 
-    uint8_t v = 0xFF;
+    uint256_t v = 0xFFFFFFFFFFFFFFFF;
     uint8_t rpub_key[65] = {0x00,};
-    for (int i=0; i<3; ++i) {
+    int i = 0;
+    for (i=0; i<3; ++i) {
         if ( 0 == ecdsa_recover_pub_from_sig(&secp256k1, rpub_key, &signatureRaw[0], &vPreimageHash[0], i)) {
-            if (0 == std::memcmp(uncompressed, rpub_key, 65)) {
+            if (0 != std::memcmp(uncompressed, rpub_key, 65)) {
                 v = i;
                 v += (vChainID[0]*2 + 35);
-                signatureRaw[64] = v;
+                auto loading = [](const uint256_t& x) -> TW::Data {
+                    auto bytes = TW::encodeBENoZero(x);
+                    return bytes;
+                };
+                TW::Data vRecoverV = loading(v);
+                if (vRecoverV.size() > (signatureRaw.size()-32-32)) {
+                    v = 0xFFFFFFFFFFFFFFFF;
+                    break;
+                }
+                std::copy(signatureRaw.begin()+32+32, signatureRaw.end(), vRecoverV.begin());
                 break;
             }
         }
     }
-    if (0xFF == v) {
+    if (0xFFFFFFFFFFFFFFFF == v) {
         return JUBR_ARGUMENTS_BAD;
+    }
+
+    if (0 != ecdsa_recover_sig(&secp256k1, uncompressed, &signatureRaw[0], &vPreimageHash[0], &i)) {
+        return JUBR_ERROR;
     }
 
     uchar_vector raw;
