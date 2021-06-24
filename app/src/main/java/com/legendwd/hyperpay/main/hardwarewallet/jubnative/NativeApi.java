@@ -183,9 +183,11 @@ public class NativeApi {
 
     public static native String nativeETHTransaction(long contextID, String json);
 
-    public static native String nativeETHERC20Transaction(long contextID, String json);
+    public static native int nativeETHSetERC20Tokens(long contextID, String json);
 
-    public static native String nativeETHBuildERC20Abi(long contextID, String json);
+    public static native int nativeETHSetERC20Token(long contextID, String json);
+
+    public static native String nativeETHBuildERC20TransferAbi(long contextID, String json);
 
     //********************************* ETH multi sign ************************************
 
@@ -250,7 +252,9 @@ public class NativeApi {
 
     public static native String nativeTRXTransaction(long contextID, String json, byte[] packedContractInPb);
 
-    public static native String nativeTRXBuildTRC20Abi(long contextID, String json);
+    public static native int nativeTRXSetTRC20Token(long contextID, String json);
+
+    public static native String nativeTRXBuildTRC20TransferAbi(long contextID, String json);
 
     public static native int nativeTRXSetTRC10Asset(long contextID, String json);
 

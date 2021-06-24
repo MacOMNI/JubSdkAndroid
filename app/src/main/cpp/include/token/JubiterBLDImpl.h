@@ -80,6 +80,8 @@ public:
     virtual JUB_RV SetERC20Token(const std::string& tokenName,
                                  const JUB_UINT16 unitDP,
                                  const std::string& contractAddress) override;
+    virtual JUB_RV SetERC20Tokens(const ERC20_TOKEN_INFO tokens[],
+                                  const JUB_UINT16 iCount) override;
 
 	//HC functions
 	virtual JUB_RV selectApplet_HC() override;
@@ -119,7 +121,7 @@ public:
 
     //ETH functions
     virtual JUB_RV SelectAppletETH() override;
-    virtual JUB_RV GetAppletVersionETH(std::string& version) override;
+    virtual JUB_RV GetAppletVersionETH(stVersion& version) override;
     virtual JUB_RV GetAddressETH(const std::string& path, const JUB_UINT16 tag, std::string& address) override;
     virtual JUB_RV GetHDNodeETH(const JUB_BYTE format, const std::string& path, std::string& pubkey) override;
     virtual JUB_RV SignTXETH(const bool bERC20,
@@ -132,9 +134,33 @@ public:
                              const std::vector<JUB_BYTE>& vPath,
                              const std::vector<JUB_BYTE>& vChainID,
                              std::vector<JUB_BYTE>& vRaw) override;
+    virtual JUB_RV _SignTXETH(const bool bERC20,
+                              const std::vector<JUB_BYTE>& vNonce,
+                              const std::vector<JUB_BYTE>& vGasPrice,
+                              const std::vector<JUB_BYTE>& vGasLimit,
+                              const std::vector<JUB_BYTE>& vTo,
+                              const std::vector<JUB_BYTE>& vValue,
+                              const std::vector<JUB_BYTE>& vData,
+                              const std::vector<JUB_BYTE>& vPath,
+                              const std::vector<JUB_BYTE>& vChainID,
+                              std::vector<JUB_BYTE>& vRaw);
+    virtual JUB_RV _SignTXUpgradeETH(const bool bERC20,
+                                     const std::vector<JUB_BYTE>& vNonce,
+                                     const std::vector<JUB_BYTE>& vGasPrice,
+                                     const std::vector<JUB_BYTE>& vGasLimit,
+                                     const std::vector<JUB_BYTE>& vTo,
+                                     const std::vector<JUB_BYTE>& vValue,
+                                     const std::vector<JUB_BYTE>& vData,
+                                     const std::vector<JUB_BYTE>& vPath,
+                                     const std::vector<JUB_BYTE>& vChainID,
+                                     std::vector<JUB_BYTE>& vRaw);
+
     virtual JUB_RV SetERC20ETHToken(const std::string& tokenName,
                                     const JUB_UINT16 unitDP,
                                     const std::string& contractAddress) override;
+    virtual JUB_RV SetERC20ETHTokens(const ERC20_TOKEN_INFO tokens[],
+                                     const JUB_UINT16 iCount) override;
+
     virtual JUB_RV SignContractETH(const JUB_BYTE inputType,
                                    const std::vector<JUB_BYTE>& vNonce,
                                    const std::vector<JUB_BYTE>& vGasPrice,
@@ -201,7 +227,7 @@ public:
     virtual JUB_RV GetFwVersion(JUB_BYTE fwVersion[4]) override;
 
     virtual JUB_RV EnumApplet(std::string& appletList) override;
-    virtual JUB_RV GetAppletVersion(const std::string& appID, std::string& version) override;
+    virtual JUB_RV GetAppletVersion(const std::string& appID, stVersion& version) override;
     virtual JUB_RV EnumSupportCoins(std::string& coinList) override;
     virtual JUB_RV GetDeviceCert(std::string& cert) override;
     virtual JUB_RV SendOneApdu(const std::string& apdu, std::string& response) override;
@@ -272,7 +298,11 @@ protected:
     std::shared_ptr<ApduBuilder> _apduBuiler;
     std::shared_ptr<DeviceType> _device;
     std::string _path;
-    std::string _appletVersion;
+    stVersionExp _appletVersion;
+
+    // ERC20 token extension apdu
+    const std::string ETH_APPLET_VERSION_SUPPORT_EXT_TOKEN = std::string("01040109");
+    const std::string ETH_APPLET_VERSION_SUPPORT_EXT_TOKENS= std::string("01080000");
 }; // class JubiterBLDImpl end
 
 }  // namespace jub end

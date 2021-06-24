@@ -2,19 +2,23 @@
 #define __ETHTokenInterface__
 
 #include "JUB_SDK_ETH.h"
+#include "utility/Version.hpp"
 
 #include <vector>
 
-// ETH token extension apdu
-#define APPLET_VERSION_SUPPORT_EXT_TOKEN "01040109"
-
 namespace jub {
+
+enum JUB_ENUM_APDU_ERC_P1 : uint8_t {
+    ERC20  = 0x00,
+    ERC721 = 0x01,
+    TOKENS_INFO = 0x02,  // Compatible with both ERC20 & ERC721
+};
 
 class ETHTokenInterface {
 
 public:
     virtual JUB_RV SelectAppletETH() = 0;
-    virtual JUB_RV GetAppletVersionETH(std::string& version) = 0;
+    virtual JUB_RV GetAppletVersionETH(stVersion& version) = 0;
     virtual JUB_RV GetAddressETH(const std::string& path, const JUB_UINT16 tag, std::string& address) = 0;
     virtual JUB_RV GetHDNodeETH(const JUB_BYTE format, const std::string& path, std::string& pubkey) = 0;
     virtual JUB_RV SignTXETH(const bool bERC20,
@@ -30,6 +34,8 @@ public:
     virtual JUB_RV SetERC20ETHToken(const std::string& tokenName,
                                     const JUB_UINT16 unitDP,
                                     const std::string& contractAddress) = 0;
+    virtual JUB_RV SetERC20ETHTokens(const ERC20_TOKEN_INFO tokens[],
+                                     const JUB_UINT16 iCount) = 0;
     virtual JUB_RV SignContractETH(const JUB_BYTE inputType,
                                    const std::vector<JUB_BYTE>& vNonce,
                                    const std::vector<JUB_BYTE>& vGasPrice,

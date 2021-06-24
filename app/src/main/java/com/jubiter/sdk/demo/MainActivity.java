@@ -241,23 +241,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     }
                 });
                 break;
-            case R.id.btn_eth_erc20_trans:
-                showProgress();
-                mJubiter.ethERC20Trans(new JubCallback<String, Void>() {
-                    @Override
-                    public void onSuccess(String s, Void aVoid) {
-                        dismissProgress();
-                        showMsg(s);
-                    }
-
-                    @Override
-                    public void onFailed(int errorCode) {
-                        dismissProgress();
-                        Log.e("ret:", errorCode + "");
-                        showMsg("errorCode:" + errorCode);
-                    }
-                });
-                break;
             case R.id.btn_btc_show_address:
                 showProgress();
                 mJubiter.btcShowAddress(0, 1, new JubCallback<String, Void>() {

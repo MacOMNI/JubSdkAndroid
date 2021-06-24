@@ -12,7 +12,7 @@
 #include "context/Context.h"
 
 #include "device/JubiterBLEDevice.hpp"
-#include "token/JubiterBLDBioImpl.h"
+#include "token/JubiterBioImpl.h"
 #ifdef __ANDROID__
 #include "utils/logUtils.h"
 #endif

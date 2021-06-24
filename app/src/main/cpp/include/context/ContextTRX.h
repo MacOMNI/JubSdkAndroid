@@ -53,10 +53,10 @@ public:
                                    JUB_CHAR_CPTR packedContractInPb,
                                    std::string& rawInJSON);
 
-    virtual JUB_RV BuildTRC20Abi(JUB_CHAR_CPTR to, JUB_CHAR_CPTR value, std::string& abi);
     virtual JUB_RV SetTRC20Token(JUB_CHAR_CPTR pTokenName,
                                  JUB_UINT16 unitDP,
                                  JUB_CHAR_CPTR pContractAddress);
+    virtual JUB_RV BuildTRC20TransferAbi(JUB_CHAR_CPTR to, JUB_CHAR_CPTR value, std::string& abi);
 
     virtual JUB_RV PackTransactionRaw(const JUB_TX_TRX& tx,
                                       std::string& packedContractInPB);

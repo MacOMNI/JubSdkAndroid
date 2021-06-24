@@ -130,7 +130,7 @@ JUB_RV ContextTRX::SignTransaction(const BIP32_Path& path,
 }
 
 
-JUB_RV ContextTRX::BuildTRC20Abi(JUB_CHAR_CPTR to, JUB_CHAR_CPTR value, std::string& abi) {
+JUB_RV ContextTRX::BuildTRC20TransferAbi(JUB_CHAR_CPTR to, JUB_CHAR_CPTR value, std::string& abi) {
 
     TW::Tron::Address toAddr(to);
     std::vector<JUB_BYTE> vTo = uchar_vector(toAddr.bytes.begin(), toAddr.bytes.end());

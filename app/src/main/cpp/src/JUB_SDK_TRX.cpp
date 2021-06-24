@@ -192,23 +192,19 @@ JUB_RV JUB_SetTRC10Asset(IN JUB_UINT16 contextID,
 
 
 /*****************************************************************************
- * @function name : JUB_BuildTRC20Abi
+ * @function name : JUB_SetTRC20Token
  * @in  param : contextID - context ID
  *          : tokenName - TRX token name
  *          : unitDP - unit decimal place
  *          : contractAddress - contract address
- *          : tokenTo - token to
- *          : tokenValue - value for token transaction
- * @out param : abi
+ * @out param : none
  * @last change :
  *****************************************************************************/
 JUB_COINCORE_DLL_EXPORT
-JUB_RV JUB_BuildTRC20Abi(IN JUB_UINT16 contextID,
+JUB_RV JUB_SetTRC20Token(IN JUB_UINT16 contextID,
                          IN JUB_CHAR_CPTR tokenName,
                          IN JUB_UINT16 unitDP,
-                         IN JUB_CHAR_CPTR contractAddress,
-                         IN JUB_CHAR_CPTR tokenTo, IN JUB_CHAR_CPTR tokenValue,
-                         OUT JUB_CHAR_PTR_PTR abi) {
+                         IN JUB_CHAR_CPTR contractAddress) {
 
     JUB_CHECK_CONTEXT_TRX(contextID);
 
@@ -217,8 +213,30 @@ JUB_RV JUB_BuildTRC20Abi(IN JUB_UINT16 contextID,
 
     JUB_VERIFY_RV(context->SetTRC20Token(tokenName, unitDP, contractAddress));
 
+    return JUBR_OK;
+}
+
+
+/*****************************************************************************
+ * @function name : JUB_BuildTRC20TransferAbi
+ * @in  param : contextID - context ID
+ *          : tokenTo - token to
+ *          : tokenValue - value for token transaction
+ * @out param : abi
+ * @last change :
+ *****************************************************************************/
+JUB_COINCORE_DLL_EXPORT
+JUB_RV JUB_BuildTRC20TransferAbi(IN JUB_UINT16 contextID,
+                                 IN JUB_CHAR_CPTR tokenTo, IN JUB_CHAR_CPTR tokenValue,
+                                 OUT JUB_CHAR_PTR_PTR abi) {
+
+    JUB_CHECK_CONTEXT_TRX(contextID);
+
+    auto context = (jub::ContextTRX*)jub::ContextManager::GetInstance()->GetOne(contextID);
+    JUB_CHECK_NULL(context);
+
     std::string strAbi;
-    JUB_VERIFY_RV(context->BuildTRC20Abi(tokenTo, tokenValue, strAbi));
+    JUB_VERIFY_RV(context->BuildTRC20TransferAbi(tokenTo, tokenValue, strAbi));
     JUB_VERIFY_RV(_allocMem(abi, strAbi));
 
     return JUBR_OK;

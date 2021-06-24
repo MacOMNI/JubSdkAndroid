@@ -1,4 +1,6 @@
 #include "token/JubiterBLDImpl.h"
+#include "libETH/ERC20Abi.h"
+#include "libETH/libETH.hpp"
 
 namespace jub {
 
@@ -6,23 +8,27 @@ constexpr JUB_BYTE kPKIAID_ETH[16] = {
     0xD1, 0x56, 0x00, 0x01, 0x32, 0x83, 0x00, 0x42, 0x4C, 0x44, 0x00, 0x00, 0x45, 0x54, 0x48, 0x01
 };
 
+
 #define SWITCH_TO_ETH_APP                       \
 do {				                            \
     JUB_VERIFY_RV(_SelectApp(kPKIAID_ETH, sizeof(kPKIAID_ETH)/sizeof(JUB_BYTE))); \
 } while (0);                                    \
+
 
 JUB_RV JubiterBLDImpl::SelectAppletETH() {
     SWITCH_TO_ETH_APP;
     return JUBR_OK;
 }
 
-JUB_RV JubiterBLDImpl::GetAppletVersionETH(std::string &version) {
+
+JUB_RV JubiterBLDImpl::GetAppletVersionETH(stVersion& version) {
 
     uchar_vector appID(kPKIAID_ETH, 16);
     JUB_VERIFY_RV(GetAppletVersion(CharPtr2HexStr(appID), version));
 
     return JUBR_OK;
 }
+
 
 JUB_RV JubiterBLDImpl::GetAddressETH(const std::string& path, const JUB_UINT16 tag, std::string& address) {
 
@@ -42,6 +48,7 @@ JUB_RV JubiterBLDImpl::GetAddressETH(const std::string& path, const JUB_UINT16 t
 
     return JUBR_OK;
 }
+
 
 JUB_RV JubiterBLDImpl::GetHDNodeETH(const JUB_BYTE format, const std::string& path, std::string& pubkey) {
 
@@ -77,6 +84,7 @@ JUB_RV JubiterBLDImpl::GetHDNodeETH(const JUB_BYTE format, const std::string& pa
     return JUBR_OK;
 }
 
+
 JUB_RV JubiterBLDImpl::SignTXETH(const bool bERC20,
                                  const std::vector<JUB_BYTE>& vNonce,
                                  const std::vector<JUB_BYTE>& vGasPrice,
@@ -88,23 +96,61 @@ JUB_RV JubiterBLDImpl::SignTXETH(const bool bERC20,
                                  const std::vector<JUB_BYTE>& vChainID,
                                  std::vector<JUB_BYTE>& vRaw) {
 
-    uchar_vector data;
-
-    if (0x00 == vNonce[0]) {
-        data << (JUB_BYTE)0x41;
-        data << (JUB_BYTE)0x00;
+    if (_appletVersion >= stVersionExp::FromString(ETH_APPLET_VERSION_SUPPORT_EXT_TOKENS)) {
+        return _SignTXUpgradeETH(bERC20,
+                                 vNonce,
+                                 vGasPrice,
+                                 vGasLimit,
+                                 vTo,
+                                 vValue,
+                                 vInput,
+                                 vPath,
+                                 vChainID,
+                                 vRaw);
     }
     else {
-        data << ToTlv(0x41, vNonce);
+        return _SignTXETH(bERC20,
+                          vNonce,
+                          vGasPrice,
+                          vGasLimit,
+                          vTo,
+                          vValue,
+                          vInput,
+                          vPath,
+                          vChainID,
+                          vRaw);
+    }
+}
+
+
+JUB_RV JubiterBLDImpl::_SignTXETH(const bool bERC20,
+                                  const std::vector<JUB_BYTE>& vNonce,
+                                  const std::vector<JUB_BYTE>& vGasPrice,
+                                  const std::vector<JUB_BYTE>& vGasLimit,
+                                  const std::vector<JUB_BYTE>& vTo,
+                                  const std::vector<JUB_BYTE>& vValue,
+                                  const std::vector<JUB_BYTE>& vInput,
+                                  const std::vector<JUB_BYTE>& vPath,
+                                  const std::vector<JUB_BYTE>& vChainID,
+                                  std::vector<JUB_BYTE>& vRaw) {
+
+    uchar_vector apduData;
+
+    if (0x00 == vNonce[0]) {
+        apduData << (JUB_BYTE)0x41;
+        apduData << (JUB_BYTE)0x00;
+    }
+    else {
+        apduData << ToTlv(0x41, vNonce);
     }
 
-    data << ToTlv(0x42, vGasPrice);
-    data << ToTlv(0x43, vGasLimit);
-    data << ToTlv(0x44, vTo);
-    data << ToTlv(0x45, vValue);
-    data << ToTlv(0x46, vInput);
-    data << ToTlv(0x47, vPath);
-    data << ToTlv(0x48, vChainID);
+    apduData << ToTlv(0x42, vGasPrice);
+    apduData << ToTlv(0x43, vGasLimit);
+    apduData << ToTlv(0x44, vTo);
+    apduData << ToTlv(0x45, vValue);
+    apduData << ToTlv(0x46, vInput);
+    apduData << ToTlv(0x47, vPath);
+    apduData << ToTlv(0x48, vChainID);
 
     JUB_BYTE ins = 0x2a;
     if (bERC20) {
@@ -112,7 +158,7 @@ JUB_RV JubiterBLDImpl::SignTXETH(const bool bERC20,
     }
 
     //one pack can do it
-    APDU apdu(0x00, ins, 0x01, 0x00, (JUB_ULONG)data.size(), data.data());
+    APDU apdu(0x00, ins, 0x01, 0x00, (JUB_ULONG)apduData.size(), apduData.data());
     JUB_UINT16 ret = 0;
     JUB_BYTE retData[2048] = {0,};
     JUB_ULONG ulRetDataLen = sizeof(retData)/sizeof(JUB_BYTE);
@@ -127,10 +173,128 @@ JUB_RV JubiterBLDImpl::SignTXETH(const bool bERC20,
     return JUBR_OK;
 }
 
+
+JUB_RV JubiterBLDImpl::_SignTXUpgradeETH(const bool bERC20,
+                                         const std::vector<JUB_BYTE>& vNonce,
+                                         const std::vector<JUB_BYTE>& vGasPrice,
+                                         const std::vector<JUB_BYTE>& vGasLimit,
+                                         const std::vector<JUB_BYTE>& vTo,
+                                         const std::vector<JUB_BYTE>& vValue,
+                                         const std::vector<JUB_BYTE>& vInput,
+                                         const std::vector<JUB_BYTE>& vPath,
+                                         const std::vector<JUB_BYTE>& vChainID,
+                                         std::vector<JUB_BYTE>& vRaw) {
+
+    uchar_vector apduData;
+
+    if (0x00 == vNonce[0]) {
+        apduData << (JUB_BYTE)0x41;
+        apduData << (JUB_BYTE)0x00;
+    }
+    else {
+        apduData << ToTlv(0x41, vNonce);
+    }
+
+    apduData << ToTlv(0x42, vGasPrice);
+    apduData << ToTlv(0x43, vGasLimit);
+    apduData << ToTlv(0x44, vTo);
+    apduData << ToTlv(0x45, vValue);
+    apduData << ToTlv(0x46, vInput);
+    apduData << ToTlv(0x47, vPath);
+    apduData << ToTlv(0x48, vChainID);
+
+    JUB_BYTE ins = 0x2a;
+    if (bERC20) {
+        ins = 0xc8;
+    }
+
+    {
+        constexpr JUB_UINT32 kSendOnceLen = 230;
+
+        JUB_ULONG offset = 23;
+
+        //  first pack
+        APDU apdu(0x00, 0xF8, 0x01, 0x00, offset, apduData.data());
+        JUB_UINT16 ret = 0;
+        JUB_VERIFY_RV(_SendApdu(&apdu, ret));
+        if (0x9000 != ret) {
+            return JUBR_TRANSMIT_DEVICE_ERROR;
+        }
+
+        unsigned long iCnt       = (apduData.size()-offset)/kSendOnceLen;
+        JUB_UINT32    iRemainder = (apduData.size()-offset)%kSendOnceLen;
+        if (iCnt) {
+            int bOnce = false;
+            for (unsigned long i=0; i<iCnt; ++i) {
+                if (   (i+1) == iCnt
+                    &&    0  == iRemainder
+                    ) {
+                    bOnce = true;
+                }
+                uchar_vector apduDataPart(&apduData[offset+i*kSendOnceLen], kSendOnceLen);
+                JUB_VERIFY_RV(_TranPack(apduDataPart, 0x00, 0x00, kSendOnceLen, bOnce));  // last data or not.
+            }
+        }
+        if (iRemainder) {
+            uchar_vector apduDataPart(&apduData[offset+iCnt*kSendOnceLen], iRemainder);
+            JUB_VERIFY_RV(_TranPack(apduDataPart, 0x00, 0x00, kSendOnceLen, true));  // last data.
+        }
+
+        apduData.clear();
+    }
+
+    //one pack can do it
+    APDU apdu(0x00, ins, 0x01, 0x00, (JUB_ULONG)apduData.size(), apduData.data());
+    JUB_UINT16 ret = 0;
+    JUB_BYTE retData[2048] = {0,};
+    JUB_ULONG ulRetDataLen = sizeof(retData)/sizeof(JUB_BYTE);
+    JUB_VERIFY_RV(_SendApdu(&apdu, ret, retData, &ulRetDataLen));
+    if (0x9000 != ret) {
+        return JUBR_TRANSMIT_DEVICE_ERROR;
+    }
+
+    uchar_vector vSignature;
+    vSignature.insert(vSignature.end(), retData, retData + ulRetDataLen);
+
+    vRaw.clear();
+    JUB_VERIFY_RV(jub::eth::serializeTx(vNonce,
+                                        vGasPrice,
+                                        vGasLimit,
+                                        vTo,
+                                        vValue,
+                                        vInput,
+                                        vSignature,
+                                        vRaw));
+
+    return JUBR_OK;
+}
+
+
 JUB_RV JubiterBLDImpl::SetERC20ETHToken(const std::string& tokenName, const JUB_UINT16 unitDP, const std::string& contractAddress) {
+
+    // ETH token extension apdu
+    if (JubiterBLDImpl::_appletVersion < stVersionExp::FromString(JubiterBLDImpl::ETH_APPLET_VERSION_SUPPORT_EXT_TOKEN)) {
+        return JUBR_OK;
+    }
 
     return SetERC20Token(tokenName, unitDP, contractAddress);
 }
+
+
+JUB_RV JubiterBLDImpl::SetERC20ETHTokens(const ERC20_TOKEN_INFO tokens[],
+                                         const JUB_UINT16 iCount) {
+
+    // ETH token extension apdu
+    if (JubiterBLDImpl::_appletVersion >= stVersionExp::FromString(JubiterBLDImpl::ETH_APPLET_VERSION_SUPPORT_EXT_TOKENS)) {
+        return SetERC20Tokens(tokens, iCount);
+    }
+    else if (1 == iCount) {
+        return SetERC20ETHToken(tokens[0].tokenName, tokens[0].unitDP, tokens[0].contractAddress);
+    }
+
+    return JUBR_OK;
+}
+
 
 JUB_RV JubiterBLDImpl::SignContractETH(const JUB_BYTE inputType,
                                        const std::vector<JUB_BYTE>& vNonce,
@@ -215,6 +379,7 @@ JUB_RV JubiterBLDImpl::SignContractETH(const JUB_BYTE inputType,
     return JUBR_OK;
 }
 
+
 JUB_RV JubiterBLDImpl::SignContractHashETH(const JUB_BYTE inputType,
                                            const std::vector<JUB_BYTE>& vGasLimit,
                                            const std::vector<JUB_BYTE>& vInputHash,
@@ -223,22 +388,22 @@ JUB_RV JubiterBLDImpl::SignContractHashETH(const JUB_BYTE inputType,
                                            const std::vector<JUB_BYTE>& vChainID,
                                            std::vector<JUB_BYTE>& signatureRaw) {
 
-    uchar_vector data;
+    uchar_vector apduData;
 
-    data << ToTlv(0x43, vGasLimit);
-    data << ToTlv(0x07, vUnsignedTxHash);
+    apduData << ToTlv(0x43, vGasLimit);
+    apduData << ToTlv(0x07, vUnsignedTxHash);
     // Too length to send at here
 //    data << ToTlv(0x46, vInput);
-    data << ToTlv(0x47, vPath);
-    data << ToTlv(0x48, vChainID);
+    apduData << ToTlv(0x47, vPath);
+    apduData << ToTlv(0x48, vChainID);
     uchar_vector tlvInput;
     tlvInput << ToTlv(inputType, vInputHash);
-    data << ToTlv(0x46, tlvInput);
+    apduData << ToTlv(0x46, tlvInput);
 
     JUB_BYTE ins = 0xca;
 
     //one pack can do it
-    APDU apdu(0x00, ins, 0x01, 0x00, (JUB_ULONG)data.size(), data.data());
+    APDU apdu(0x00, ins, 0x01, 0x00, (JUB_ULONG)apduData.size(), apduData.data());
     JUB_UINT16 ret = 0;
     JUB_BYTE retData[2048] = {0,};
     JUB_ULONG ulRetDataLen = sizeof(retData)/sizeof(JUB_BYTE);
