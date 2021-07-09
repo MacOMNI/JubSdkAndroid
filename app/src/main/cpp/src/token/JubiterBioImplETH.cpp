@@ -14,19 +14,20 @@ JUB_RV JubiterBioImpl::SignTXETH(const bool bERC20,
                                  const std::vector<JUB_BYTE>& vChainID,
                                  std::vector<JUB_BYTE>& vRaw) {
 
-    if (_appletVersion >= stVersionExp::FromString(ETH_APPLET_VERSION_SUPPORT_EXT_TOKENS)) {
-        return _SignTXUpgradeETH(bERC20,
-                                 vNonce,
-                                 vGasPrice,
-                                 vGasLimit,
-                                 vTo,
-                                 vValue,
-                                 vData,
-                                 vPath,
-                                 vChainID,
-                                 vRaw);
-    }
-    else {
+    // Remove subpackage sending APDU.
+//    if (_appletVersion >= stVersionExp::FromString(ETH_APPLET_VERSION_SUPPORT_EXT_TOKENS)) {
+//        return _SignTXUpgradeETH(bERC20,
+//                                 vNonce,
+//                                 vGasPrice,
+//                                 vGasLimit,
+//                                 vTo,
+//                                 vValue,
+//                                 vData,
+//                                 vPath,
+//                                 vChainID,
+//                                 vRaw);
+//    }
+//    else {
         return _SignTXETH(bERC20,
                           vNonce,
                           vGasPrice,
@@ -37,7 +38,7 @@ JUB_RV JubiterBioImpl::SignTXETH(const bool bERC20,
                           vPath,
                           vChainID,
                           vRaw);
-    }
+//    }
 }
 
 
