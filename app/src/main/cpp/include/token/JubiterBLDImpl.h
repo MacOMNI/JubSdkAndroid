@@ -242,7 +242,7 @@ public:
     //FIL functions
     virtual JUB_RV SelectAppletFIL() override;
     virtual JUB_RV SetCoinTypeFIL() override;
-    virtual JUB_RV GetAppletVersionFIL(std::string& version) override;
+    virtual JUB_RV GetAppletVersionFIL(stVersion& version) override;
     virtual JUB_RV GetAddressFIL(const std::string& path, const JUB_UINT16 tag, std::string& address) override;
     virtual JUB_RV GetHDNodeFIL(const JUB_BYTE format, const std::string& path, std::string& pubkey) override;
     virtual JUB_RV SignTXFIL(const uint64_t& nonce,

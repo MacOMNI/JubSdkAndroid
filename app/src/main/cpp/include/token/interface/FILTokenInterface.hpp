@@ -24,7 +24,7 @@ class FILTokenInterface {
 public:
     virtual JUB_RV SelectAppletFIL() = 0;
     virtual JUB_RV SetCoinTypeFIL() = 0;
-    virtual JUB_RV GetAppletVersionFIL(std::string& version) = 0;
+    virtual JUB_RV GetAppletVersionFIL(stVersion& version) = 0;
     virtual JUB_RV GetAddressFIL(const std::string& path, const JUB_UINT16 tag, std::string& address) = 0;
     virtual JUB_RV GetHDNodeFIL(const JUB_BYTE format, const std::string& path, std::string& pubkey) = 0;
     virtual JUB_RV SignTXFIL(const uint64_t& nonce,

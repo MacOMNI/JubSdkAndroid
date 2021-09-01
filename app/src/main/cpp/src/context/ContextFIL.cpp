@@ -26,6 +26,7 @@ JUB_RV ContextFIL::ActiveSelf() {
     JUB_CHECK_NULL(ctoken);
 
     JUB_VERIFY_RV(token->SelectAppletFIL());
+    JUB_VERIFY_RV(token->GetAppletVersionFIL(_appletVersion));
     JUB_VERIFY_RV(ctoken->SetTimeout(_timeout));
     JUB_VERIFY_RV(token->SetCoinTypeFIL());
 

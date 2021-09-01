@@ -26,7 +26,6 @@ typedef enum {
     NS_ITEM
 } JUB_ENUM_IDENTITY_VERIFY_MODE;
 
-
 /*****************************************************************************
  * @function name : JUB_IdentityVerifyPIN
  * @in  param : deviceID - device ID

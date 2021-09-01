@@ -21,7 +21,7 @@ JUB_RV JubiterBLDImpl::SetCoinTypeFIL() {
     return _SetCoinType((JUB_BYTE)JUB_ENUM_COINTYPE_ETH::COINFIL);
 }
 
-JUB_RV JubiterBLDImpl::GetAppletVersionFIL(std::string &version) {
+JUB_RV JubiterBLDImpl::GetAppletVersionFIL(stVersion &version) {
 
     uchar_vector appID(kPKIAID_ETH, 16);
     JUB_VERIFY_RV(GetAppletVersion(CharPtr2HexStr(appID), version));

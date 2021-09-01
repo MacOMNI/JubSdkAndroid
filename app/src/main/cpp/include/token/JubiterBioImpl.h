@@ -15,6 +15,8 @@ public:
     JubiterBioImpl(DeviceType* device);
     ~JubiterBioImpl();
 
+    static stAppInfos g_appInfo[];
+
 public:
     const JUB_UINT16 DEFAULT_FP_TIMEOUT = 8;
 

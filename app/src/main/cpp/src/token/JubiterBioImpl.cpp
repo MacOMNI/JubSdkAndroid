@@ -3,6 +3,73 @@
 
 namespace jub {
 
+
+stAppInfos JubiterBioImpl::g_appInfo[] = {
+    {
+        abcd::DataChunk(uchar_vector(kPKIAID_BTC, sizeof(kPKIAID_BTC)/sizeof(JUB_BYTE))),
+        "BTC",
+        "05010000"
+    },
+    {
+        abcd::DataChunk(uchar_vector(kPKIAID_ETH, sizeof(kPKIAID_ETH)/sizeof(JUB_BYTE))),
+        "ETH",
+        "05000001"
+    },
+    // BTC and ETH index position fixed, start adding new apps below:
+    {
+        abcd::DataChunk(uchar_vector(kPKIAID_ETH, sizeof(kPKIAID_ETH)/sizeof(JUB_BYTE))),
+        "ETC",
+        "05000001"
+    },
+    {
+        abcd::DataChunk(uchar_vector(kPKIAID_ETH, sizeof(kPKIAID_ETH)/sizeof(JUB_BYTE))),
+        "FIL",
+        "05020000"
+    },
+    {
+        abcd::DataChunk(uchar_vector(kPKIAID_BTC, sizeof(kPKIAID_BTC)/sizeof(JUB_BYTE))),
+        "BCH",
+        "05010000"
+    },
+    {
+        abcd::DataChunk(uchar_vector(kPKIAID_BTC, sizeof(kPKIAID_BTC)/sizeof(JUB_BYTE))),
+        "LTC",
+        "05010000",
+    },
+    {
+        abcd::DataChunk(uchar_vector(kPKIAID_BTC, sizeof(kPKIAID_BTC)/sizeof(JUB_BYTE))),
+        "USDT",
+        "05010000"
+    },
+    {
+        abcd::DataChunk(uchar_vector(kPKIAID_HC, sizeof(kPKIAID_HC)/sizeof(JUB_BYTE))),
+        "HC",
+        "05010000"
+    },
+    {
+        abcd::DataChunk(uchar_vector(kPKIAID_BTC, sizeof(kPKIAID_BTC)/sizeof(JUB_BYTE))),
+        "QTUM",
+        "05010000"
+    },
+    // MISC applet, start adding new apps below:
+    {
+        abcd::DataChunk(uchar_vector(kPKIAID_MISC, sizeof(kPKIAID_MISC)/sizeof(JUB_BYTE))),
+        "EOS",
+        "05000000"
+    },
+    {
+        abcd::DataChunk(uchar_vector(kPKIAID_MISC, sizeof(kPKIAID_MISC)/sizeof(JUB_BYTE))),
+        "XRP",
+        "05000000"
+    },
+    {
+        abcd::DataChunk(uchar_vector(kPKIAID_MISC, sizeof(kPKIAID_MISC)/sizeof(JUB_BYTE))),
+        "TRX",
+        "05000000"
+    },
+};
+
+
 JubiterBioImpl::JubiterBioImpl(std::string path)
     : JubiterBLDImpl(path) {
 

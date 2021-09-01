@@ -108,6 +108,7 @@ JUB_RV ContextTRX::SignTransaction(const BIP32_Path& path,
         tx.raw_data.deserialize(vRaw);
         tx.signature = vSignatureRaw[0];
 
+        // must do verification for calculating the TXID and assign the value
 #if defined(DEBUG)
         //verify
         std::string pubkey;
