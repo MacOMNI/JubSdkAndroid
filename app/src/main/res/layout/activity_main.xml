@@ -144,12 +144,6 @@
                 android:text="eth_transaction_test" />
 
             <Button
-                android:id="@+id/btn_eth_erc20_trans"
-                style="@style/button"
-                android:onClick="onClick"
-                android:text="eth_erc20_transaction_test" />
-
-            <Button
                 android:id="@+id/btn_eth_showAddress"
                 style="@style/button"
                 android:onClick="onClick"

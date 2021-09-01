@@ -1,5 +1,5 @@
-#ifndef __JuBiterBLDBioImpl__
-#define __JuBiterBLDBioImpl__
+#ifndef __JuBiterBioImpl__
+#define __JuBiterBioImpl__
 
 
 #include "JubiterBLDImpl.h"
@@ -8,15 +8,12 @@
 namespace jub {
 
 
-class JubiterBLDBioImpl
+class JubiterBioImpl
 : public JubiterBLDImpl {
 public:
-    static stAppInfos g_appInfo[];
-
-public:
-    JubiterBLDBioImpl(std::string path);
-    JubiterBLDBioImpl(DeviceType* device);
-    ~JubiterBLDBioImpl();
+    JubiterBioImpl(std::string path);
+    JubiterBioImpl(DeviceType* device);
+    ~JubiterBioImpl();
 
 public:
     const JUB_UINT16 DEFAULT_FP_TIMEOUT = 8;
@@ -53,8 +50,29 @@ public:
     virtual JUB_RV EraseFingerprint(IN JUB_UINT16 fpTimeout) override;
     virtual JUB_RV DeleteFingerprint(IN JUB_UINT16 fpTimeout,
                                      JUB_BYTE fgptID) override;
-}; // class JubiterBLDBioImpl end
+
+    //ETH functions
+    virtual JUB_RV SignTXETH(const bool bERC20,
+                             const std::vector<JUB_BYTE>& vNonce,
+                             const std::vector<JUB_BYTE>& vGasPrice,
+                             const std::vector<JUB_BYTE>& vGasLimit,
+                             const std::vector<JUB_BYTE>& vTo,
+                             const std::vector<JUB_BYTE>& vValue,
+                             const std::vector<JUB_BYTE>& vData,
+                             const std::vector<JUB_BYTE>& vPath,
+                             const std::vector<JUB_BYTE>& vChainID,
+                             std::vector<JUB_BYTE>& vRaw) override;
+    virtual JUB_RV SetERC20ETHToken(const std::string& tokenName,
+                                    const JUB_UINT16 unitDP,
+                                    const std::string& contractAddress) override;
+    virtual JUB_RV SetERC20ETHTokens(const ERC20_TOKEN_INFO tokens[],
+                                     const JUB_UINT16 iCount) override;
+
+protected:
+    // ERC20 token extension apdu
+    const std::string  ETH_APPLET_VERSION_SUPPORT_EXT_TOKENS= std::string("05050000");  // 5.5.0
+}; // class JubiterBioImpl end
 
 }  // namespace jub end
 
-#endif  // __JuBiterBLDBioImpl__
+#endif  // __JuBiterBioImpl__

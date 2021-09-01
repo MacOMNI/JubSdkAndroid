@@ -12,13 +12,14 @@
 
 #include "utility/util.h"
 #include "utility/Singleton.h"
+#include "utility/Version.hpp"
 
 #include "context/Context.h"
 #include "context/ContextBTC.h"
 #include "token/interface/TokenInterface.hpp"
 
 #include "token/JubiterBLDImpl.h"
-#include "token/JubiterBLDBioImpl.h"
+#include "token/JubiterBioImpl.h"
 
 
 JUB_RV _allocMem(JUB_CHAR_PTR_PTR memPtr, const std::string &strBuf);
@@ -56,7 +57,7 @@ JUB_RV JUB_GetDeviceType(IN JUB_UINT16 deviceID,
 #endif
         *deviceClass = JUB_ENUM_DEVICE::BLADE;
     }
-    else if (typeid(jub::JubiterBLDBioImpl) == typeid(*token)) {
+    else if (typeid(jub::JubiterBioImpl) == typeid(*token)) {
 #ifdef HID_MODE
         *commode = JUB_ENUM_COMMODE::HID;
 #else
@@ -214,8 +215,9 @@ JUB_RV JUB_GetAppletVersion(IN JUB_UINT16 deviceID,
     auto token = jub::TokenManager::GetInstance()->GetOne(deviceID);
     JUB_CHECK_NULL(token);
 
-    std::string str_version;
-    JUB_VERIFY_RV(token->GetAppletVersion(appID,str_version));
+    stVersion v;
+    JUB_VERIFY_RV(token->GetAppletVersion(appID, v));
+    std::string str_version = stVersionExp::ToString(v);
     JUB_VERIFY_RV(_allocMem(version, str_version));
 
     return JUBR_OK;

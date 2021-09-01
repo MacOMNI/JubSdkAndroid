@@ -14,7 +14,8 @@ constexpr JUB_BYTE kMainnetP2SH_Multisig = 0x11;
 #define APPLET_BTC_SUPPORT_LEGACY_ADDRESS_VERSION "01090205"
 
 bool JubiterBLDImpl::_isSupportLegacyAddress() {
-    if (0 <= _appletVersion.compare(APPLET_BTC_SUPPORT_LEGACY_ADDRESS_VERSION)) {
+
+    if (JubiterBLDImpl::_appletVersion >= stVersionExp::FromString(APPLET_BTC_SUPPORT_LEGACY_ADDRESS_VERSION)) {
         return true;
     }
 

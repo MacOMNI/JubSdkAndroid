@@ -11,7 +11,7 @@
 #include "utility/util.h"
 
 #include "device/JubiterBLEDevice.hpp"
-#include "token/JubiterBLDBioImpl.h"
+#include "token/JubiterBioImpl.h"
 #ifdef __ANDROID__
 #include "utils/logUtils.h"
 #endif
@@ -99,8 +99,8 @@ JUB_RV JUB_connectDevice(JUB_BYTE_PTR devName,
         return JUBR_ERROR;
     }
 
-    if (!(jub::JubiterBLDBioImpl::ConfirmType(devName)
-          || jub::JubiterBLDImpl::ConfirmType(devName))
+    if (!(jub::JubiterBioImpl::ConfirmType(devName)
+       || jub::JubiterBLDImpl::ConfirmType(devName))
         ) {
         return JUBR_ARGUMENTS_BAD;
     }
@@ -113,8 +113,8 @@ JUB_RV JUB_connectDevice(JUB_BYTE_PTR devName,
     *pDeviceID = BLE_device_map::GetInstance()->AddOne(pdevHandle);
 //    LOG_INF("JUB_connectDevice rv: %hu", *pDeviceID);
 
-    if (jub::JubiterBLDBioImpl::ConfirmType(devName)) {
-        jub::JubiterBLDBioImpl* token = new jub::JubiterBLDBioImpl(bleDevice);
+    if (jub::JubiterBioImpl::ConfirmType(devName)) {
+        jub::JubiterBioImpl* token = new jub::JubiterBioImpl(bleDevice);
 
         jub::TokenManager::GetInstance()->AddOne(*pDeviceID, token);
     }

@@ -8,12 +8,12 @@ stAppInfos JubiterBLDImpl::g_appInfo[] = {
     {
         abcd::DataChunk(uchar_vector(kPKIAID_BTC, sizeof(kPKIAID_BTC)/sizeof(JUB_BYTE))),
         "BTC",
-        "0000000"
+        "00000000"
     },
     {
         abcd::DataChunk(uchar_vector(kPKIAID_ETH, sizeof(kPKIAID_ETH)/sizeof(JUB_BYTE))),
         "ETH",
-        "0000000"
+        "00000000"
     },
     // BTC and ETH index position fixed, start adding new apps below:
     {
@@ -152,7 +152,7 @@ JUB_RV JubiterBLDImpl::EnumSupportCoins(std::string& coinList) {
     std::vector<std::string> coinNameList;
     auto vAppList = Split(appletList, " ");
     for (auto appID : vAppList) {
-        std::string version;
+        stVersionExp version;
         rv = GetAppletVersion(appID, version);
         if (JUBR_OK != rv) {
             continue;
@@ -162,7 +162,7 @@ JUB_RV JubiterBLDImpl::EnumSupportCoins(std::string& coinList) {
             if (_appID.getHex() != appID) {
                 continue;
             }
-            if (appInfo.minimumAppletVersion > version) {
+            if (stVersionExp::FromString(appInfo.minimumAppletVersion) > version) {
                 continue;
             }
             if (coinNameList.end() == std::find(coinNameList.begin(), coinNameList.end(), appInfo.coinName)) {
@@ -177,7 +177,7 @@ JUB_RV JubiterBLDImpl::EnumSupportCoins(std::string& coinList) {
 }
 
 
-JUB_RV JubiterBLDImpl::GetAppletVersion(const std::string& appID, std::string& version) {
+JUB_RV JubiterBLDImpl::GetAppletVersion(const std::string& appID, stVersion& version) {
 
     uchar_vector id(appID);
     if (0 == appID.length()) {
@@ -185,17 +185,18 @@ JUB_RV JubiterBLDImpl::GetAppletVersion(const std::string& appID, std::string& v
     }
 
     JUB_UINT16 ret = 0;
+    //select
+    APDU apdu(0x00, 0xA4, 0x04, 0x00, (JUB_ULONG)id.size(), &id[0]);
+    JUB_BYTE retData[1024] = { 0, };
+    JUB_ULONG ulRetDataLen = sizeof(retData) / sizeof(JUB_BYTE);
+    JUB_VERIFY_RV(_SendApdu(&apdu, ret, retData, &ulRetDataLen));
+    if (0x9000 != ret) {
+        JUB_VERIFY_RV(JUBR_TRANSMIT_DEVICE_ERROR);
+    }
+
+    uchar_vector vVersion(4);
     uchar_vector FidoID(kPKIAID_FIDO, 8);
     if (id == FidoID) {
-        //select
-        APDU apdu(0x00, 0xA4, 0x04, 0x00, (JUB_ULONG)id.size(), &id[0]);
-        JUB_BYTE retData[1024] = {0,};
-        JUB_ULONG ulRetDataLen = sizeof(retData)/sizeof(JUB_BYTE);
-        JUB_VERIFY_RV(_SendApdu(&apdu, ret, retData, &ulRetDataLen));
-        if (0x9000 != ret) {
-            JUB_VERIFY_RV(JUBR_TRANSMIT_DEVICE_ERROR);
-        }
-
         //get version
         uchar_vector apduData = tlv_buf(0xDFFF, uchar_vector("8001")).encode();
         APDU apduVersion(0x80, 0xE2, 0x80, 0x00, (JUB_ULONG)apduData.size(), &apduData[0], 0x00);
@@ -206,29 +207,17 @@ JUB_RV JubiterBLDImpl::GetAppletVersion(const std::string& appID, std::string& v
             JUB_VERIFY_RV(JUBR_TRANSMIT_DEVICE_ERROR);
         }
 
-        uchar_vector vVersion(&retDataVersion[6], 4);
-        version = vVersion.getHex();
-        return JUBR_OK;
+        vVersion = uchar_vector(&retDataVersion[6], 4);
     }
     else {
-        APDU apdu(0x00, 0xA4, 0x04, 0x00, (JUB_ULONG)id.size(), &id[0]);
-        JUB_BYTE retData[1024] = {0,};
-        JUB_ULONG ulRetDataLen = sizeof(retData)/sizeof(JUB_BYTE);
-        JUB_VERIFY_RV(_SendApdu(&apdu, ret, retData, &ulRetDataLen));
-        if (0x9000 != ret) {
-            JUB_VERIFY_RV(JUBR_TRANSMIT_DEVICE_ERROR);
-        }
-
         if (   0x84 == retData[2]
             && 0x04 == retData[3]
             ) {
-            uchar_vector vVersion(&retData[4], 4);
-            version = vVersion.getHex();
-            return JUBR_OK;
+            vVersion = uchar_vector(&retData[4], 4);
         }
     }
 
-    JUB_VERIFY_RV(JUBR_ERROR);
+    version = stVersionExp::FromString(vVersion.getHex());
 
     return JUBR_OK;
 }
@@ -547,14 +536,46 @@ JUB_RV JubiterBLDImpl::SetERC20Token(const std::string& tokenName, const JUB_UIN
     uchar_vector address;
     address << ETHHexStr2CharPtr(contractAddress);
 
-    uchar_vector data;
-    data << (uint8_t)unitDP;
-    data << (uint8_t)lvName.size();
-    data << lvName;
-    data << (uint8_t)address.size();
-    data << address;
+    uchar_vector apduData;
+    apduData << (uint8_t)unitDP;
+    apduData << (uint8_t)lvName.size();
+    apduData << lvName;
+    apduData << (uint8_t)address.size();
+    apduData << address;
 
-    APDU apdu(0x00, 0xc7, 0x00, 0x00, (JUB_ULONG)data.size(), data.data());
+    APDU apdu(0x00, 0xc7, JUB_ENUM_APDU_ERC_P1::ERC20, 0x00, (JUB_ULONG)apduData.size(), apduData.data());
+    JUB_UINT16 ret = 0;
+    JUB_VERIFY_RV(_SendApdu(&apdu, ret));
+    if (0x9000 != ret) {
+        return JUBR_TRANSMIT_DEVICE_ERROR;
+    }
+
+    return JUBR_OK;
+}
+
+
+JUB_RV JubiterBLDImpl::SetERC20Tokens(const ERC20_TOKEN_INFO tokens[],
+                                      const JUB_UINT16 iCount) {
+
+    if (2 < iCount) {
+        return JUBR_ARGUMENTS_BAD;
+    }
+
+    uchar_vector apduData;
+    apduData << (uint8_t)iCount;
+    for (JUB_UINT16 i=0; i<iCount; ++i) {
+        uchar_vector lvName = Tollv(tokens[i].tokenName);
+        uchar_vector address;
+        address << ETHHexStr2CharPtr(tokens[i].contractAddress);
+
+        apduData << (uint8_t)tokens[i].unitDP;
+        apduData << (uint8_t)lvName.size();
+        apduData << lvName;
+        apduData << (uint8_t)address.size();
+        apduData << address;
+    }
+
+    APDU apdu(0x00, 0xc7, JUB_ENUM_APDU_ERC_P1::TOKENS_INFO, 0x00, (JUB_ULONG)apduData.size(), apduData.data());
     JUB_UINT16 ret = 0;
     JUB_VERIFY_RV(_SendApdu(&apdu, ret));
     if (0x9000 != ret) {
@@ -635,7 +656,7 @@ JUB_RV JubiterBLDImpl::_SelectApp(const JUB_BYTE PKIAID[], JUB_BYTE length) {
     }
 
     uchar_vector vVersion(&retData[4], retData[3]);
-    _appletVersion = vVersion.getHex();
+    _appletVersion = stVersionExp::FromString(vVersion.getHex());
 
     return JUBR_OK;
 }

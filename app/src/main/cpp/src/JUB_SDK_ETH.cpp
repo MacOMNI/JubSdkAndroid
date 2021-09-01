@@ -196,23 +196,42 @@ JUB_RV JUB_SignTransactionETH(IN JUB_UINT16 contextID,
 
 
 /*****************************************************************************
- * @function name : JUB_BuildERC20AbiETH
+ * @function name : JUB_SetERC20TokensETH
  * @in  param : contextID - context ID
- *          : tokenName - ETH token name
- *          : unitDP - unit decimal place
- *          : contractAddress - contract address
- *          : tokenTo - token to
- *          : tokenValue - value for token transaction
- * @out param : abi
+ *          : tokens - token info list
+ *          : iCount - token info count
  * @last change :
  *****************************************************************************/
-JUB_RV JUB_BuildERC20AbiETH(IN JUB_UINT16 contextID,
+JUB_COINCORE_DLL_EXPORT
+JUB_RV JUB_SetERC20TokensETH(IN JUB_UINT16 contextID,
+                             IN ERC20_TOKEN_INFO tokens[],
+                             IN JUB_UINT16 iCount) {
+
+    JUB_CHECK_CONTEXT_ETH(contextID);
+
+    auto context = (jub::ContextETH*)jub::ContextManager::GetInstance()->GetOne(contextID);
+    JUB_CHECK_NULL(context);
+
+    JUB_VERIFY_RV(context->SetERC20ETHTokens(tokens, iCount));
+
+    return JUBR_OK;
+}
+
+
+/*****************************************************************************
+ * @function name : JUB_SetERC20TokenETH
+ * @in  param : contextID - context ID
+ *            : tokenName - ETH token name
+ *            : unitDP - unit decimal place
+ *            : contractAddress - contract address
+ * @out param : none.
+ * @last change :
+ *****************************************************************************/
+JUB_COINCORE_DLL_EXPORT
+JUB_RV JUB_SetERC20TokenETH(IN JUB_UINT16 contextID,
                             IN JUB_CHAR_CPTR tokenName,
                             IN JUB_UINT16 unitDP,
-                            IN JUB_CHAR_CPTR contractAddress,
-                            IN JUB_CHAR_CPTR tokenTo,
-                            IN JUB_CHAR_CPTR tokenValue,
-                            OUT JUB_CHAR_PTR_PTR abi) {
+                            IN JUB_CHAR_CPTR contractAddress) {
 
     JUB_CHECK_CONTEXT_ETH(contextID);
 
@@ -221,8 +240,30 @@ JUB_RV JUB_BuildERC20AbiETH(IN JUB_UINT16 contextID,
 
     JUB_VERIFY_RV(context->SetERC20ETHToken(tokenName, unitDP, contractAddress));
 
+    return JUBR_OK;
+}
+
+
+/*****************************************************************************
+ * @function name : JUB_BuildERC20TransferAbiETH
+ * @in  param : contextID - context ID
+ *          : tokenTo - token to
+ *          : tokenValue - value for token transaction
+ * @out param : ERC20 transfer abi
+ * @last change :
+ *****************************************************************************/
+JUB_COINCORE_DLL_EXPORT
+JUB_RV JUB_BuildERC20TransferAbiETH(IN JUB_UINT16 contextID,
+                                    IN JUB_CHAR_CPTR tokenTo, IN JUB_CHAR_CPTR tokenValue,
+                                    OUT JUB_CHAR_PTR_PTR abi) {
+
+    JUB_CHECK_CONTEXT_ETH(contextID);
+
+    auto context = (jub::ContextETH*)jub::ContextManager::GetInstance()->GetOne(contextID);
+    JUB_CHECK_NULL(context);
+
     std::string strAbi;
-    JUB_VERIFY_RV(context->BuildERC20Abi(tokenTo, tokenValue, strAbi));
+    JUB_VERIFY_RV(context->BuildERC20TransferAbi(tokenTo, tokenValue, strAbi));
     JUB_VERIFY_RV(_allocMem(abi, strAbi));
 
     return JUBR_OK;

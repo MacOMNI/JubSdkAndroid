@@ -1067,87 +1067,6 @@ public class JubiterImpl {
         }).start();
     }
 
-    public void ethERC20Trans(final JubCallback<String, Void> callback) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                int[] contextIDs = new int[1];
-                NativeApi.nativeETHCreateContext(contextIDs,
-                        JSONParseUtils.getJsonStr(mContext, "testETH_setToken.json"),
-                        mDeviceHandle);
-                final long contextID = contextIDs[0];
-
-                Log.d("ethTrans contextID:", " " + contextID);
-
-                int ret = NativeApi.nativeShowVirtualPwd(contextID);
-                if (ret != 0) {
-                    final int finalRet = ret;
-                    mUIHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onFailed(finalRet);
-                        }
-                    });
-                    return;
-                }
-
-                mUIHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        final VerifyPinDialog dialog = new VerifyPinDialog(mContext, new VerifyPinDialog.callback() {
-                            @Override
-                            public void onClickListener(String pin) {
-                                int ret = 0;
-                                if (TextUtils.isEmpty(pin) || pin.length() != 4) {
-                                    final int finalRet = ret;
-                                    mUIHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            callback.onFailed(finalRet);
-                                        }
-                                    });
-                                    return;
-                                }
-
-                                ret = NativeApi.nativeVerifyPIN(contextID, pin.getBytes());
-
-                                if (ret != 0) {
-                                    final int finalRet = ret;
-                                    mUIHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            callback.onFailed(finalRet);
-                                        }
-                                    });
-                                    return;
-                                }
-                                final String rawString = NativeApi.nativeETHERC20Transaction(contextID, JSONParseUtils.getJsonStr(mContext, "testETH_setToken.json"));
-                                if (TextUtils.isEmpty(rawString)) {
-                                    mUIHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            callback.onFailed(NativeApi.nativeGetErrorCode());
-                                        }
-                                    });
-                                    return;
-                                }
-                                mUIHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        callback.onSuccess(rawString, null);
-                                    }
-                                });
-                            }
-                        });
-                        dialog.show();
-                    }
-                });
-
-            }
-        }).start();
-    }
-
 
     public void ethGetAddress(final JubCallback<String, String> callback) {
         new Thread(new Runnable() {
@@ -1775,10 +1694,21 @@ public class JubiterImpl {
                         JSONParseUtils.getJsonStr(mContext, "testETH_multi_contract_test.json"),
                         mDeviceHandle);
                 final long contextID = contextIDs[0];
-                String data = NativeApi.nativeETHBuildERC20Abi(contextID, JSONParseUtils.getJsonStr(mContext, "testETH_setToken.json"));
+                int ret = NativeApi.nativeETHSetERC20Token(contextID, JSONParseUtils.getJsonStr(mContext, "testETH_setToken.json"));
+                if (ret != 0) {
+                    final int finalRet = ret;
+                    mUIHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onFailed(finalRet);
+                        }
+                    });
+                    return;
+                }
+                String data = NativeApi.nativeETHBuildERC20TransferAbi(contextID, JSONParseUtils.getJsonStr(mContext, "testETH_setToken.json"));
                 final String rawString = NativeApi.nativeETHBuildContractWithAddrAmtDataAbi(contextID, JSONParseUtils.getJsonStr(mContext, "testETH_multi_build_with_addr_amt.json"));
                 Log.d("ethContract contextID:", " " + contextID);
-                int ret = NativeApi.nativeShowVirtualPwd(contextID);
+                ret = NativeApi.nativeShowVirtualPwd(contextID);
                 if (ret != 0) {
                     final int finalRet = ret;
                     mUIHandler.post(new Runnable() {
@@ -1845,6 +1775,99 @@ public class JubiterImpl {
             }
         }).start();
     }
+
+    public void ethErc20(final JubCallback<String, String> callback) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                int[] contextIDs = new int[1];
+                NativeApi.nativeETHCreateContext(contextIDs,
+                        JSONParseUtils.getJsonStr(mContext, "testETH_erc20.json"),
+                        mDeviceHandle);
+                final long contextID = contextIDs[0];
+                int ret = NativeApi.nativeETHSetERC20Token(contextID, JSONParseUtils.getJsonStr(mContext, "testETH_erc20.json"));
+                if (ret != 0) {
+                    final int finalRet = ret;
+                    mUIHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onFailed(finalRet);
+                        }
+                    });
+                    return;
+                }
+                String data = NativeApi.nativeETHBuildERC20TransferAbi(contextID, JSONParseUtils.getJsonStr(mContext, "testETH_erc20.json"));
+                Log.d("erc20 abi", " " + data);
+                ret = NativeApi.nativeShowVirtualPwd(contextID);
+                if (ret != 0) {
+                    final int finalRet = ret;
+                    mUIHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onFailed(finalRet);
+                        }
+                    });
+                    return;
+                }
+
+                mUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        final VerifyPinDialog dialog = new VerifyPinDialog(mContext, new VerifyPinDialog.callback() {
+                            @Override
+                            public void onClickListener(String pin) {
+                                int ret = 0;
+                                if (TextUtils.isEmpty(pin) || pin.length() != 4) {
+                                    final int finalRet = ret;
+                                    mUIHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            callback.onFailed(finalRet);
+                                        }
+                                    });
+                                    return;
+                                }
+
+                                ret = NativeApi.nativeVerifyPIN(contextID, pin.getBytes());
+
+                                if (ret != 0) {
+                                    final int finalRet = ret;
+                                    mUIHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            callback.onFailed(finalRet);
+                                        }
+                                    });
+                                    return;
+                                }
+                                final String rawString = NativeApi.nativeETHTransaction(contextID, JSONParseUtils.getJsonStr(mContext, "testETH_erc20.json"));
+                                if (TextUtils.isEmpty(rawString)) {
+                                    mUIHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            callback.onFailed(NativeApi.nativeGetErrorCode());
+                                        }
+                                    });
+                                    return;
+                                }
+                                Log.d("erc20 raw", " " + rawString);
+                                mUIHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        callback.onSuccess(rawString, null);
+                                    }
+                                });
+                            }
+                        });
+                        dialog.show();
+                    }
+                });
+
+            }
+        }).start();
+    }
+
 
 
     public void ethTransactionUniswapV2Router02(final JubCallback<String, String> callback) {

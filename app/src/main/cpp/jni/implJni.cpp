@@ -873,9 +873,9 @@ native_ETHCreateContext(JNIEnv *env, jclass obj, jintArray jContextId, jstring j
     cfg.chainID = root[CHAIN_ID].asInt();
     int rv = JUB_CreateContextETH(cfg, static_cast<JUB_UINT16>(deviceInfo), pContextID);
     if (rv != JUBR_OK) {
-        LOG_ERR("JUB_GetAddressETH: %08x", rv);
+        LOG_ERR("JUB_CreateContextETH: %08x", rv);
     } else {
-        LOG_INF("JUB_GetAddressETH: %d", *pContextID);
+        LOG_INF("JUB_CreateContextETH: %d", *pContextID);
     }
     env->ReleaseIntArrayElements(jContextId, (jint *) pContextID, FALSE);
     return rv;
@@ -916,7 +916,34 @@ JNIEXPORT jstring JNICALL native_ETH_Transaction(JNIEnv *env, jclass obj, jlong 
     return rawString;
 }
 
-JNIEXPORT jstring JNICALL native_ETH_BuildERC20Abi(JNIEnv *env, jclass obj, jlong contextID,
+JNIEXPORT jint JNICALL native_ETH_SetERC20Tokens(JNIEnv *env, jclass obj, jlong contextID,
+                                                       jstring jJSON) {
+    JUB_CHAR_PTR pJSON = const_cast<JUB_CHAR_PTR>(env->GetStringUTFChars(jJSON, NULL));
+
+    Json::Reader reader;
+    Json::Value root;
+    reader.parse(pJSON, root);
+
+    std::vector<ERC20_TOKEN_INFO> tokens;
+    int tokensCount = root.size();
+    for (int i = 0; i < tokensCount; i++) {
+        ERC20_TOKEN_INFO info;
+        info.tokenName = (JUB_CHAR_PTR) root[i]["tokenName"].asCString();
+        info.unitDP = root[i]["dp"].asDouble();
+        info.contractAddress = (JUB_CHAR_PTR) root[i]["contractAddress"].asCString();
+        tokens.push_back(info);
+    }
+
+
+    JUB_RV rv = JUB_SetERC20TokensETH(contextID, &tokens[0], tokensCount);
+    if (rv != JUBR_OK) {
+        LOG_ERR("JUB_SetERC20TokensETH: %08x", rv);
+    }
+    env->ReleaseStringUTFChars(jJSON, pJSON);
+    return rv;
+}
+
+JNIEXPORT jint JNICALL native_ETH_SetERC20Token(JNIEnv *env, jclass obj, jlong contextID,
                                                        jstring jJSON) {
     JUB_CHAR_PTR pJSON = const_cast<JUB_CHAR_PTR>(env->GetStringUTFChars(jJSON, NULL));
 
@@ -925,18 +952,35 @@ JNIEXPORT jstring JNICALL native_ETH_BuildERC20Abi(JNIEnv *env, jclass obj, jlon
     reader.parse(pJSON, root);
 
 
-    char *token_to = (char *) root["ERC20"]["token_to"].asCString();
-    char *token_value = (char *) root["ERC20"]["token_value"].asCString();
     char *tokenName = (char *) root["ERC20Token"]["tokenName"].asCString();
     uint16_t unitDP = root["ERC20Token"]["dp"].asDouble();
     char *contractAddress = (char *) root["ERC20Token"]["contract_address"].asCString();
 
 
+    JUB_RV rv = JUB_SetERC20TokenETH(contextID, tokenName, unitDP, contractAddress);
+    if (rv != JUBR_OK) {
+        LOG_ERR("JUB_SetERC20TokenETH: %08x", rv);
+    }
+    env->ReleaseStringUTFChars(jJSON, pJSON);
+    return rv;
+}
+
+JNIEXPORT jstring JNICALL native_ETH_BuildERC20TransferAbi(JNIEnv *env, jclass obj, jlong contextID,
+                                                       jstring jJSON) {
+    JUB_CHAR_PTR pJSON = const_cast<JUB_CHAR_PTR>(env->GetStringUTFChars(jJSON, NULL));
+
+    Json::Reader reader;
+    Json::Value root;
+    reader.parse(pJSON, root);
+
+    char *token_to = (char *) root["ERC20"]["token_to"].asCString();
+    char *token_value = (char *) root["ERC20"]["token_value"].asCString();
+
     char *abi = nullptr;
-    JUB_RV rv = JUB_BuildERC20AbiETH(contextID, tokenName, unitDP, contractAddress, token_to,
+    JUB_RV rv = JUB_BuildERC20TransferAbiETH(contextID, token_to,
                                      token_value, &abi);
     if (rv != JUBR_OK) {
-        LOG_ERR("JUB_BuildERC20AbiETH: %08x", rv);
+        LOG_ERR("JUB_BuildERC20TransferAbiETH: %08x", rv);
         env->ReleaseStringUTFChars(jJSON, pJSON);
         return NULL;
     }
@@ -945,54 +989,6 @@ JNIEXPORT jstring JNICALL native_ETH_BuildERC20Abi(JNIEnv *env, jclass obj, jlon
     return rawString;
 }
 
-
-JNIEXPORT jstring JNICALL native_ETH_ERC20_Transaction(JNIEnv *env, jclass obj, jlong contextID,
-                                                       jstring jJSON) {
-
-    JUB_CHAR_PTR pJSON = const_cast<JUB_CHAR_PTR>(env->GetStringUTFChars(jJSON, NULL));
-
-    Json::Reader reader;
-    Json::Value root;
-    reader.parse(pJSON, root);
-
-    uint32_t nonce = root["ERC20"]["nonce"].asDouble();
-    uint32_t gasLimit = root["ERC20"]["gasLimit"].asDouble();
-    char *gasPriceInWei = (char *) root["ERC20"]["gasPriceInWei"].asCString();
-    char *to = (char *) root["ERC20"]["contract_address"].asCString();
-    char *token_to = (char *) root["ERC20"]["token_to"].asCString();
-    char *token_value = (char *) root["ERC20"]["token_value"].asCString();
-
-    BIP32_Path path;
-    path.change = (JUB_ENUM_BOOL) root["ERC20"]["bip32_path"]["change"].asBool();
-    path.addressIndex = root["ERC20"]["bip32_path"]["addressIndex"].asUInt();
-
-    char *tokenName = (char *) root["ERC20Token"]["tokenName"].asCString();
-    uint16_t unitDP = root["ERC20Token"]["dp"].asDouble();
-    char *contractAddress = (char *) root["ERC20Token"]["contract_address"].asCString();
-
-
-    char *abi = nullptr;
-    JUB_RV rv = JUB_BuildERC20AbiETH(contextID, tokenName, unitDP, contractAddress, token_to,
-                                     token_value, &abi);
-    if (rv != JUBR_OK) {
-        LOG_ERR("JUB_BuildERC20AbiETH: %08x", rv);
-        env->ReleaseStringUTFChars(jJSON, pJSON);
-        return NULL;
-    }
-
-    char *raw = nullptr;
-    rv = JUB_SignTransactionETH(contextID, path, nonce, gasLimit, gasPriceInWei, to, 0, abi, &raw);
-
-    JUB_FreeMemory(abi);
-    if (rv != JUBR_OK) {
-        errorCode = static_cast<int>(rv);
-        return NULL;
-    }
-
-    jstring rawString = env->NewStringUTF(raw);
-    JUB_FreeMemory(raw);
-    return rawString;
-}
 
 JNIEXPORT jstring JNICALL native_ETH_SignContract(JNIEnv *env, jclass obj, jlong contextID,
                                                        jstring jJSON) {
@@ -2217,7 +2213,29 @@ native_TRXTransaction(JNIEnv *env, jclass obj, jlong contextID, jstring jJSON, j
     return rawString;
 }
 
-JNIEXPORT jstring JNICALL native_TRXBuildTRC20Abi(JNIEnv *env, jclass obj, jlong contextID,
+JNIEXPORT jint JNICALL native_TRXSetTRC20Token(JNIEnv *env, jclass obj, jlong contextID,
+                                                  jstring jJSON) {
+    JUB_CHAR_PTR pJSON = const_cast<JUB_CHAR_PTR>(env->GetStringUTFChars(jJSON, NULL));
+
+    Json::Reader reader;
+    Json::Value root;
+    reader.parse(pJSON, root);
+
+    char *tokenName = (char *) root["TRC20"]["tokenName"].asCString();
+    uint16_t unitDP = root["TRC20"]["dp"].asDouble();
+    char *contractAddress = (char *) root["TRC20"]["contract_address"].asCString();
+
+
+    JUB_RV rv = JUB_SetTRC20Token(contextID, tokenName, unitDP, contractAddress);
+
+    env->ReleaseStringUTFChars(jJSON, pJSON);
+    if (rv != JUBR_OK) {
+        LOG_ERR("JUB_SetTRC20Token: %08x", rv);
+    }
+    return rv;
+}
+
+JNIEXPORT jstring JNICALL native_TRXBuildTRC20TransferAbi(JNIEnv *env, jclass obj, jlong contextID,
                                                   jstring jJSON) {
     JUB_CHAR_PTR pJSON = const_cast<JUB_CHAR_PTR>(env->GetStringUTFChars(jJSON, NULL));
 
@@ -2227,13 +2245,9 @@ JNIEXPORT jstring JNICALL native_TRXBuildTRC20Abi(JNIEnv *env, jclass obj, jlong
 
     char *token_to = (char *) root["TRC20"]["token_to"].asCString();
     char *token_value = (char *) root["TRC20"]["token_value"].asCString();
-    char *tokenName = (char *) root["TRC20"]["tokenName"].asCString();
-    uint16_t unitDP = root["TRC20"]["dp"].asDouble();
-    char *contractAddress = (char *) root["TRC20"]["contract_address"].asCString();
-
 
     char *abi = nullptr;
-    JUB_RV rv = JUB_BuildTRC20Abi(contextID, tokenName, unitDP, contractAddress, token_to,
+    JUB_RV rv = JUB_BuildTRC20TransferAbi(contextID, token_to,
                                   token_value, &abi);
 
     env->ReleaseStringUTFChars(jJSON, pJSON);
@@ -2853,14 +2867,19 @@ static JNINativeMethod gMethods[] = {
                 (void *) native_ETH_Transaction
         },
         {
-                "nativeETHERC20Transaction",
-                "(JLjava/lang/String;)Ljava/lang/String;",
-                (void *) native_ETH_ERC20_Transaction
+                "nativeETHSetERC20Tokens",
+                "(JLjava/lang/String;)I",
+                (void *) native_ETH_SetERC20Tokens
         },
         {
-                "nativeETHBuildERC20Abi",
+                "nativeETHSetERC20Token",
+                "(JLjava/lang/String;)I",
+                (void *) native_ETH_SetERC20Token
+        },
+        {
+                "nativeETHBuildERC20TransferAbi",
                 "(JLjava/lang/String;)Ljava/lang/String;",
-                (void *) native_ETH_BuildERC20Abi
+                (void *) native_ETH_BuildERC20TransferAbi
         },
         {
                 "nativeETHSetContrAddr",
@@ -3036,9 +3055,14 @@ static JNINativeMethod gMethods[] = {
                 (void *) native_TRXTransaction
         },
         {
-                "nativeTRXBuildTRC20Abi",
+                "nativeTRXSetTRC20Token",
+                "(JLjava/lang/String;)I",
+                (void *) native_TRXSetTRC20Token
+        },
+        {
+                "nativeTRXBuildTRC20TransferAbi",
                 "(JLjava/lang/String;)Ljava/lang/String;",
-                (void *) native_TRXBuildTRC20Abi
+                (void *) native_TRXBuildTRC20TransferAbi
         },
         {
                 "nativeTRXSetTRC10Asset",

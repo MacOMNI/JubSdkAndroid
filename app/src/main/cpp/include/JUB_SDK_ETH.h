@@ -26,6 +26,18 @@ typedef struct stContextCfgETH : stContextCfg {
 } CONTEXT_CONFIG_ETH;
 
 
+typedef struct stERC20TokenInfo {
+    JUB_CHAR_PTR tokenName;
+    JUB_UINT16 unitDP;
+    JUB_CHAR_PTR contractAddress;
+
+    stERC20TokenInfo() {
+        unitDP = 0;
+    }
+    virtual ~stERC20TokenInfo() {}
+} ERC20_TOKEN_INFO;
+
+
 /*****************************************************************************
  * @function name : JUB_CreateContextETH
  * @in  param : cfg
@@ -123,23 +135,47 @@ JUB_RV JUB_SignTransactionETH(IN JUB_UINT16 contextID,
 
 
 /*****************************************************************************
- * @function name : JUB_BuildERC20AbiETH
+ * @function name : JUB_SetERC20TokensETH
  * @in  param : contextID - context ID
- *            : tokenName - ETH token name
- *            : unitDP - unit decimal place
- *            : contractAddress - contract address
- *            : tokenTo - token to
- *            : tokenValue - value for token transaction
+ *          : tokens - token info list
+ *          : iCount - token info count
  * @out param : ERC20 abi
  * @last change :
  *****************************************************************************/
 JUB_COINCORE_DLL_EXPORT
-JUB_RV JUB_BuildERC20AbiETH(IN JUB_UINT16 contextID,
+JUB_RV JUB_SetERC20TokensETH(IN JUB_UINT16 contextID,
+                             IN ERC20_TOKEN_INFO tokens[],
+                             IN JUB_UINT16 iCount);
+
+
+/*****************************************************************************
+ * @function name : JUB_SetERC20TokenETH
+ * @in  param : contextID - context ID
+ *            : tokenName - ETH token name
+ *            : unitDP - unit decimal place
+ *            : contractAddress - contract address
+ * @out param : none.
+ * @last change :
+ *****************************************************************************/
+JUB_COINCORE_DLL_EXPORT
+JUB_RV JUB_SetERC20TokenETH(IN JUB_UINT16 contextID,
                             IN JUB_CHAR_CPTR tokenName,
                             IN JUB_UINT16 unitDP,
-                            IN JUB_CHAR_CPTR contractAddress,
-                            IN JUB_CHAR_CPTR tokenTo, IN JUB_CHAR_CPTR tokenValue,
-                            OUT JUB_CHAR_PTR_PTR abi);
+                            IN JUB_CHAR_CPTR contractAddress);
+
+
+/*****************************************************************************
+ * @function name : JUB_BuildERC20TransferAbiETH
+ * @in  param : contextID - context ID
+ *          : tokenTo - token to
+ *          : tokenValue - value for token transaction
+ * @out param : ERC20 abi
+ * @last change :
+ *****************************************************************************/
+JUB_COINCORE_DLL_EXPORT
+JUB_RV JUB_BuildERC20TransferAbiETH(IN JUB_UINT16 contextID,
+                                    IN JUB_CHAR_CPTR tokenTo, IN JUB_CHAR_CPTR tokenValue,
+                                    OUT JUB_CHAR_PTR_PTR abi);
 
 
 /*****************************************************************************

@@ -1,93 +1,26 @@
-#include "token/JubiterBLDBioImpl.h"
+#include "token/JubiterBioImpl.h"
 #include "JUB_SDK_DEV_BIO.h"
 
 namespace jub {
 
-
-stAppInfos JubiterBLDBioImpl::g_appInfo[] = {
-    {
-        abcd::DataChunk(uchar_vector(kPKIAID_BTC, sizeof(kPKIAID_BTC)/sizeof(JUB_BYTE))),
-        "BTC",
-        "05010000"
-    },
-    {
-        abcd::DataChunk(uchar_vector(kPKIAID_ETH, sizeof(kPKIAID_ETH)/sizeof(JUB_BYTE))),
-        "ETH",
-        "05000001"
-    },
-    // BTC and ETH index position fixed, start adding new apps below:
-    {
-        abcd::DataChunk(uchar_vector(kPKIAID_ETH, sizeof(kPKIAID_ETH)/sizeof(JUB_BYTE))),
-        "ETC",
-        "05000001"
-    },
-    {
-        abcd::DataChunk(uchar_vector(kPKIAID_ETH, sizeof(kPKIAID_ETH)/sizeof(JUB_BYTE))),
-        "FIL",
-        "05020000"
-    },
-    {
-        abcd::DataChunk(uchar_vector(kPKIAID_BTC, sizeof(kPKIAID_BTC)/sizeof(JUB_BYTE))),
-        "BCH",
-        "05010000"
-    },
-    {
-        abcd::DataChunk(uchar_vector(kPKIAID_BTC, sizeof(kPKIAID_BTC)/sizeof(JUB_BYTE))),
-        "LTC",
-        "05010000",
-    },
-    {
-        abcd::DataChunk(uchar_vector(kPKIAID_BTC, sizeof(kPKIAID_BTC)/sizeof(JUB_BYTE))),
-        "USDT",
-        "05010000"
-    },
-    {
-        abcd::DataChunk(uchar_vector(kPKIAID_HC, sizeof(kPKIAID_HC)/sizeof(JUB_BYTE))),
-        "HC",
-        "05010000"
-    },
-    {
-        abcd::DataChunk(uchar_vector(kPKIAID_BTC, sizeof(kPKIAID_BTC)/sizeof(JUB_BYTE))),
-        "QTUM",
-        "05010000"
-    },
-    // MISC applet, start adding new apps below:
-    {
-        abcd::DataChunk(uchar_vector(kPKIAID_MISC, sizeof(kPKIAID_MISC)/sizeof(JUB_BYTE))),
-        "EOS",
-        "05000000"
-    },
-    {
-        abcd::DataChunk(uchar_vector(kPKIAID_MISC, sizeof(kPKIAID_MISC)/sizeof(JUB_BYTE))),
-        "XRP",
-        "05000000"
-    },
-    {
-        abcd::DataChunk(uchar_vector(kPKIAID_MISC, sizeof(kPKIAID_MISC)/sizeof(JUB_BYTE))),
-        "TRX",
-        "05000000"
-    },
-};
-
-
-JubiterBLDBioImpl::JubiterBLDBioImpl(std::string path)
+JubiterBioImpl::JubiterBioImpl(std::string path)
     : JubiterBLDImpl(path) {
 
 }
 
 
-JubiterBLDBioImpl::JubiterBLDBioImpl(DeviceType* device)
+JubiterBioImpl::JubiterBioImpl(DeviceType* device)
     : JubiterBLDImpl(device) {
 
 }
 
 
-JubiterBLDBioImpl::~JubiterBLDBioImpl() {
+JubiterBioImpl::~JubiterBioImpl() {
 
 }
 
 
-bool JubiterBLDBioImpl::IsBootLoader() {
+bool JubiterBioImpl::IsBootLoader() {
 
     APDU apdu(0x00, 0xa4, 0x04, 0x00, 0x00);
     JUB_UINT16 ret = 0;
@@ -104,7 +37,7 @@ bool JubiterBLDBioImpl::IsBootLoader() {
 }
 
 
-JUB_RV JubiterBLDBioImpl::UIShowMain() {
+JUB_RV JubiterBioImpl::UIShowMain() {
 
     uchar_vector apduData = tlv_buf(0xDFFF, tlv_buf(0x8144).encodeT()).encode();
     APDU apdu(0x80, 0xCB, 0x80, 0x00, (JUB_ULONG)apduData.size(), apduData.data());
@@ -123,7 +56,7 @@ JUB_RV JubiterBLDBioImpl::UIShowMain() {
 }
 
 
-JUB_RV JubiterBLDBioImpl::IdentityVerify(IN JUB_BYTE mode, OUT JUB_ULONG &retry) {
+JUB_RV JubiterBioImpl::IdentityVerify(IN JUB_BYTE mode, OUT JUB_ULONG &retry) {
 
     if (JUB_ENUM_IDENTITY_VERIFY_MODE::VIA_FPGT != mode) {
         return JUBR_ARGUMENTS_BAD;
@@ -150,7 +83,7 @@ JUB_RV JubiterBLDBioImpl::IdentityVerify(IN JUB_BYTE mode, OUT JUB_ULONG &retry)
 }
 
 
-JUB_RV JubiterBLDBioImpl::IdentityVerifyPIN(IN JUB_BYTE mode, IN const std::string &pinMix, OUT JUB_ULONG &retry) {
+JUB_RV JubiterBioImpl::IdentityVerifyPIN(IN JUB_BYTE mode, IN const std::string &pinMix, OUT JUB_ULONG &retry) {
 
     // send apdu.
     std::vector<uint8_t> pin;
@@ -190,7 +123,7 @@ JUB_RV JubiterBLDBioImpl::IdentityVerifyPIN(IN JUB_BYTE mode, IN const std::stri
 }
 
 
-JUB_RV JubiterBLDBioImpl::IdentityNineGrids(IN bool bShow) {
+JUB_RV JubiterBioImpl::IdentityNineGrids(IN bool bShow) {
 
     JUB_BYTE value = 0x00;
     if (!bShow) {
@@ -214,7 +147,7 @@ JUB_RV JubiterBLDBioImpl::IdentityNineGrids(IN bool bShow) {
 }
 
 
-JUB_RV JubiterBLDBioImpl::VerifyFingerprint(OUT JUB_ULONG &retry) {
+JUB_RV JubiterBioImpl::VerifyFingerprint(OUT JUB_ULONG &retry) {
 
     JUB_CHECK_NULL(_device);
 
@@ -238,9 +171,9 @@ JUB_RV JubiterBLDBioImpl::VerifyFingerprint(OUT JUB_ULONG &retry) {
 }
 
 
-JUB_RV JubiterBLDBioImpl::EnrollFingerprint(IN JUB_UINT16 fpTimeout,
-                                            INOUT JUB_BYTE_PTR fgptIndex, OUT JUB_ULONG_PTR ptimes,
-                                            OUT JUB_BYTE_PTR fgptID) {
+JUB_RV JubiterBioImpl::EnrollFingerprint(IN JUB_UINT16 fpTimeout,
+                                         INOUT JUB_BYTE_PTR fgptIndex, OUT JUB_ULONG_PTR ptimes,
+                                         OUT JUB_BYTE_PTR fgptID) {
     uchar_vector tagData;
     tagData.push_back(*fgptIndex);
     if (DEFAULT_FP_TIMEOUT != fpTimeout) {
@@ -293,7 +226,7 @@ JUB_RV JubiterBLDBioImpl::EnrollFingerprint(IN JUB_UINT16 fpTimeout,
 }
 
 
-JUB_RV JubiterBLDBioImpl::EnumFingerprint(std::string& fgptList) {
+JUB_RV JubiterBioImpl::EnumFingerprint(std::string& fgptList) {
 
     uchar_vector apduData = tlv_buf(0xDFFF, tlv_buf(0x8211).encodeT()).encode();
     APDU apdu(0x80, 0xCB, 0x80, 0x00, (JUB_ULONG)apduData.size(), apduData.data());
@@ -372,7 +305,7 @@ JUB_RV JubiterBLDBioImpl::EnumFingerprint(std::string& fgptList) {
 }
 
 
-JUB_RV JubiterBLDBioImpl::EraseFingerprint(IN JUB_UINT16 fpTimeout) {
+JUB_RV JubiterBioImpl::EraseFingerprint(IN JUB_UINT16 fpTimeout) {
 
     uchar_vector apduData = tlv_buf(0xDFFE, tlv_buf(0x8212).encodeT()).encode();
     if (DEFAULT_FP_TIMEOUT != fpTimeout) {
@@ -402,8 +335,8 @@ JUB_RV JubiterBLDBioImpl::EraseFingerprint(IN JUB_UINT16 fpTimeout) {
 }
 
 
-JUB_RV JubiterBLDBioImpl::DeleteFingerprint(IN JUB_UINT16 fpTimeout,
-                                            JUB_BYTE fgptID) {
+JUB_RV JubiterBioImpl::DeleteFingerprint(IN JUB_UINT16 fpTimeout,
+                                         JUB_BYTE fgptID) {
 
     uchar_vector tagData;
     tagData.push_back(fgptID);

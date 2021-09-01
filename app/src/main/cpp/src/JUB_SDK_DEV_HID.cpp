@@ -11,7 +11,7 @@
 #include "utility/util.h"
 
 #include "device/JubiterHidDevice.hpp"
-#include "token/JubiterBLDBioImpl.h"
+#include "token/JubiterBioImpl.h"
 
 
 /*****************************************************************************
@@ -37,8 +37,8 @@ JUB_RV JUB_ListDeviceHid(OUT JUB_UINT16 deviceIDs[MAX_DEVICE]) {
             continue;
         }
         bool bCheckTypeid = PID_BLD == pid ?
-        (typeid(jub::JubiterBLDImpl)    == typeid(*token)) :
-        (typeid(jub::JubiterBLDBioImpl) == typeid(*token));
+        (typeid(jub::JubiterBLDImpl) == typeid(*token)) :
+        (typeid(jub::JubiterBioImpl) == typeid(*token));
         if (std::end(path_list) == std::find(std::begin(path_list), std::end(path_list), token->getPath())
             && bCheckTypeid
             ) {
@@ -56,8 +56,8 @@ JUB_RV JUB_ListDeviceHid(OUT JUB_UINT16 deviceIDs[MAX_DEVICE]) {
                 continue;
             }
             bool bCheckTypeid = PID_BLD == pid ?
-            (typeid(jub::JubiterBLDImpl)    == typeid(*token)) :
-            (typeid(jub::JubiterBLDBioImpl) == typeid(*token));
+            (typeid(jub::JubiterBLDImpl) == typeid(*token)) :
+            (typeid(jub::JubiterBioImpl) == typeid(*token));
             if (   token
                 && path == token->getPath()
                 && bCheckTypeid
@@ -81,7 +81,7 @@ JUB_RV JUB_ListDeviceHid(OUT JUB_UINT16 deviceIDs[MAX_DEVICE]) {
             }
             case PID_BIO:
             {
-                jub::JubiterBLDBioImpl* token = new jub::JubiterBLDBioImpl(path);
+                jub::JubiterBioImpl* token = new jub::JubiterBioImpl(path);
                 jub::TokenManager::GetInstance()->AddOne(token);
                 break;
             }

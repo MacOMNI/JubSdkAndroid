@@ -35,7 +35,7 @@ public:
     virtual JUB_RV GetBleVersion(JUB_BYTE bleVersion[4]) = 0;
     virtual JUB_RV GetFwVersion(JUB_BYTE fwVersion[4]) = 0;
     virtual JUB_RV EnumApplet(std::string& appletList) = 0;
-    virtual JUB_RV GetAppletVersion(const std::string& appID, std::string& version) = 0;
+    virtual JUB_RV GetAppletVersion(const std::string& appID, stVersion& version) = 0;
     virtual JUB_RV EnumSupportCoins(std::string& coinList) = 0;
     virtual JUB_RV GetDeviceCert(std::string& cert) = 0;
     virtual JUB_RV SendOneApdu(const std::string& apdu, std::string& response) = 0;
@@ -48,6 +48,8 @@ public:
     virtual JUB_RV SetERC20Token(const std::string& tokenName,
                                  const JUB_UINT16 unitDP,
                                  const std::string& contractAddress) = 0;
+    virtual JUB_RV SetERC20Tokens(const ERC20_TOKEN_INFO tokens[],
+                                  const JUB_UINT16 iCount) = 0;
 
     // BIO
     virtual JUB_RV UIShowMain() = 0;

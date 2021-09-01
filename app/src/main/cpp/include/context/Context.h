@@ -10,6 +10,7 @@
 
 #include "utility/Singleton.h"
 #include "utility/xManager.hpp"
+#include "token/interface/TokenInterface.hpp"
 
 namespace jub {
 
@@ -34,7 +35,7 @@ protected:
     JUB_UINT16  _timeout;
 
     virtual std::string _FullBip32Path(const BIP32_Path& path);
-    std::string _appletVersion;
+    stVersionExp _appletVersion;
 }; // class Context end
 
 class AutoContextManager : public xManager<jub::Context> {

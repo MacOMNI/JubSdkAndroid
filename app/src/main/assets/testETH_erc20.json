@@ -1,0 +1,33 @@
+{
+  "ERC20": {
+    "contract_address": "0xa2af509ddb7c1a894bda7bd82b30089531f237ca",
+    "token_to": "0x4f7e578ca0beff5d770160e2b4523ec7d7d48ff3",
+    "token_value": "100000000000000000000",
+    "bip32_path": {
+      "addressIndex": 0,
+      "change": false
+    },
+    "gasLimit": 64720,
+    "gasPriceInWei": "5000000000",
+    "nonce": 18
+  },
+  "ETH": {
+    "data": "0xa9059cbb0000000000000000000000004f7e578ca0beff5d770160e2b4523ec7d7d48ff30000000000000000000000000000000000000000000000056bc75e2d63100000",
+    "to": "0xa2af509ddb7c1a894bda7bd82b30089531f237ca",
+    "valueInWei": "",
+    "bip32_path": {
+      "addressIndex": 0,
+      "change": false
+    },
+    "gasLimit": 64720,
+    "gasPriceInWei": "5000000000",
+    "nonce": 18
+  },
+  "ERC20Token": {
+    "contract_address": "0xa2af509ddb7c1a894bda7bd82b30089531f237ca",
+    "dp": 18,
+    "tokenName": "oshc"
+  },
+  "chainID": 128,
+  "main_path": "m/44'/60'/0'"
+}

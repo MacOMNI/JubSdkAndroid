@@ -7,8 +7,11 @@
 #include "TrustWallet/wallet-core/src/Hash.h"
 #include "TrezorCrypto/ecdsa.h"
 #include "TrezorCrypto/secp256k1.h"
+#include "TrustWallet/wallet-core/src/BinaryCoding.h"
+#include <uint256_t/uint256_t.h>
 
 namespace jub {
+
 
 JUB_RV ContextETH::ActiveSelf() {
 
@@ -25,6 +28,7 @@ JUB_RV ContextETH::ActiveSelf() {
     return JUBR_OK;
 }
 
+
 JUB_RV ContextETH::GetAddress(const BIP32_Path& path, const JUB_UINT16 tag, std::string& address) {
 
     auto token = dynamic_cast<ETHTokenInterface*>(jub::TokenManager::GetInstance()->GetOne(_deviceID));
@@ -36,6 +40,7 @@ JUB_RV ContextETH::GetAddress(const BIP32_Path& path, const JUB_UINT16 tag, std:
     return JUBR_OK;
 }
 
+
 JUB_RV ContextETH::GetMainHDNode(const JUB_BYTE format, std::string& xpub) {
 
     auto token = dynamic_cast<ETHTokenInterface*>(jub::TokenManager::GetInstance()->GetOne(_deviceID));
@@ -45,6 +50,7 @@ JUB_RV ContextETH::GetMainHDNode(const JUB_BYTE format, std::string& xpub) {
 
     return JUBR_OK;
 }
+
 
 JUB_RV ContextETH::SetMyAddress(const BIP32_Path& path, std::string& address) {
 
@@ -57,6 +63,7 @@ JUB_RV ContextETH::SetMyAddress(const BIP32_Path& path, std::string& address) {
     return JUBR_OK;
 }
 
+
 JUB_RV ContextETH::GetHDNode(const JUB_BYTE& format, const BIP32_Path& path, std::string& pubkey) {
 
     auto token = dynamic_cast<ETHTokenInterface*>(jub::TokenManager::GetInstance()->GetOne(_deviceID));
@@ -67,6 +74,7 @@ JUB_RV ContextETH::GetHDNode(const JUB_BYTE& format, const BIP32_Path& path, std
 
     return JUBR_OK;
 }
+
 
 JUB_RV ContextETH::SignTransaction(const BIP32_Path& path,
                                    const JUB_UINT32 nonce,
@@ -131,7 +139,8 @@ JUB_RV ContextETH::SignTransaction(const BIP32_Path& path,
     return JUBR_OK;
 }
 
-JUB_RV ContextETH::BuildERC20Abi(JUB_CHAR_CPTR to, JUB_CHAR_CPTR value, std::string& abi) {
+
+JUB_RV ContextETH::BuildERC20TransferAbi(JUB_CHAR_CPTR to, JUB_CHAR_CPTR value, std::string& abi) {
 
     std::vector<JUB_BYTE> vTo = jub::ETHHexStr2CharPtr(to);
     std::vector<JUB_BYTE> vValue = jub::HexStr2CharPtr(DecStringToHexString(std::string(value)));
@@ -141,14 +150,10 @@ JUB_RV ContextETH::BuildERC20Abi(JUB_CHAR_CPTR to, JUB_CHAR_CPTR value, std::str
     return JUBR_OK;
 }
 
+
 JUB_RV ContextETH::SetERC20ETHToken(JUB_CHAR_CPTR pTokenName,
                                     JUB_UINT16 unitDP,
                                     JUB_CHAR_CPTR pContractAddress) {
-
-    // ETH token extension apdu
-    if (0 > _appletVersion.compare(APPLET_VERSION_SUPPORT_EXT_TOKEN)) {
-        return JUBR_OK;
-    }
 
     JUB_CHECK_NULL(pTokenName);
     JUB_CHECK_NULL(pContractAddress);
@@ -164,6 +169,25 @@ JUB_RV ContextETH::SetERC20ETHToken(JUB_CHAR_CPTR pTokenName,
 
     return JUBR_OK;
 }
+
+
+JUB_RV ContextETH::SetERC20ETHTokens(ERC20_TOKEN_INFO tokens[],
+                                     JUB_UINT16 iCount) {
+
+    if ((nullptr == tokens)
+        ||    (0 >= iCount)
+        ) {
+        return JUBR_ARGUMENTS_BAD;
+    }
+
+    auto token = dynamic_cast<ETHTokenInterface*>(jub::TokenManager::GetInstance()->GetOne(_deviceID));
+    JUB_CHECK_NULL(token);
+
+    JUB_VERIFY_RV(token->SetERC20ETHTokens(tokens, iCount));
+
+    return JUBR_OK;
+}
+
 
 JUB_RV ContextETH::SignContract(const BIP32_Path& path,
                                 const JUB_UINT32 nonce,
@@ -253,20 +277,34 @@ JUB_RV ContextETH::SignContract(const BIP32_Path& path,
         return JUBR_ARGUMENTS_BAD;
     }
 
-    uint8_t v = 0xFF;
+    uint256_t v = 0xFFFFFFFFFFFFFFFF;
     uint8_t rpub_key[65] = {0x00,};
-    for (int i=0; i<3; ++i) {
+    int i = 0;
+    for (i=0; i<3; ++i) {
         if ( 0 == ecdsa_recover_pub_from_sig(&secp256k1, rpub_key, &signatureRaw[0], &vPreimageHash[0], i)) {
-            if (0 == std::memcmp(uncompressed, rpub_key, 65)) {
+            if (0 != std::memcmp(uncompressed, rpub_key, 65)) {
                 v = i;
                 v += (vChainID[0]*2 + 35);
-                signatureRaw[64] = v;
+                auto loading = [](const uint256_t& x) -> TW::Data {
+                    auto bytes = TW::encodeBENoZero(x);
+                    return bytes;
+                };
+                TW::Data vRecoverV = loading(v);
+                if (vRecoverV.size() > (signatureRaw.size()-32-32)) {
+                    v = 0xFFFFFFFFFFFFFFFF;
+                    break;
+                }
+                std::copy(signatureRaw.begin()+32+32, signatureRaw.end(), vRecoverV.begin());
                 break;
             }
         }
     }
-    if (0xFF == v) {
+    if (0xFFFFFFFFFFFFFFFF == v) {
         return JUBR_ARGUMENTS_BAD;
+    }
+
+    if (0 != ecdsa_recover_sig(&secp256k1, uncompressed, &signatureRaw[0], &vPreimageHash[0], &i)) {
+        return JUBR_ERROR;
     }
 
     uchar_vector raw;
@@ -284,6 +322,7 @@ JUB_RV ContextETH::SignContract(const BIP32_Path& path,
     return JUBR_OK;
 }
 
+
 //JUB_RV ContextETH::BuildContractWithAddrAbi(JUB_CHAR_CPTR methodID,
 //                                            JUB_CHAR_CPTR address,
 //                                            std::string& abi) {
@@ -296,6 +335,7 @@ JUB_RV ContextETH::SignContract(const BIP32_Path& path,
 //
 //    return JUBR_OK;
 //}
+//
 //
 //JUB_RV ContextETH::BuildContractWithAddrAmtAbi(JUB_CHAR_CPTR methodID,
 //                                               JUB_CHAR_CPTR address, JUB_CHAR_CPTR amount,
@@ -311,6 +351,7 @@ JUB_RV ContextETH::SignContract(const BIP32_Path& path,
 //    return JUBR_OK;
 //}
 //
+//
 JUB_RV ContextETH::BuildContractWithTxIDAbi(JUB_CHAR_CPTR methodID,
                                             JUB_CHAR_CPTR transactionID,
                                             std::string& abi) {
@@ -324,6 +365,7 @@ JUB_RV ContextETH::BuildContractWithTxIDAbi(JUB_CHAR_CPTR methodID,
     return JUBR_OK;
 }
 
+
 //JUB_RV ContextETH::BuildContractWithAmtAbi(JUB_CHAR_CPTR methodID,
 //                                           JUB_CHAR_CPTR amount,
 //                                           std::string& abi) {
@@ -336,16 +378,18 @@ JUB_RV ContextETH::BuildContractWithTxIDAbi(JUB_CHAR_CPTR methodID,
 //
 //    return JUBR_OK;
 //}
-
+//
+//
 JUB_RV ContextETH::BuildContractWithAddrAmtDataAbi(JUB_CHAR_CPTR methodID,
                                                    JUB_CHAR_CPTR address, JUB_CHAR_CPTR amount, JUB_CHAR_CPTR data,
                                                    std::string& abi) {
+
     _addContrFunc(std::string(methodID), jub::eth::ENUM_CONTRACT_ABI::WITH_ADDRESS_AMOUNT_DATA);
 
     std::vector<JUB_BYTE> vMethodID = jub::ETHHexStr2CharPtr(methodID);
-    std::vector<JUB_BYTE> vAddress = jub::ETHHexStr2CharPtr(address);
-    std::vector<JUB_BYTE> vAmount = jub::HexStr2CharPtr(DecStringToHexString(std::string(amount)));
-    std::vector<JUB_BYTE> vData = jub::ETHHexStr2CharPtr(data);
+    std::vector<JUB_BYTE> vAddress  = jub::ETHHexStr2CharPtr(address);
+    std::vector<JUB_BYTE> vAmount   = jub::HexStr2CharPtr(DecStringToHexString(std::string(amount)));
+    std::vector<JUB_BYTE> vData     = jub::ETHHexStr2CharPtr(data);
     uchar_vector udata(vData);
     uchar_vector vAbi = jub::eth::ContractAbi::serialize(vMethodID, vAddress, vAmount, vData);
     std::string _abi = vAbi.getHex();

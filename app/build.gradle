@@ -18,7 +18,7 @@ android {
                         "-std=c++11",
                         "-frtti",
                         "-fexceptions",
-//                        "-DDEBUG",
+                        "-DDEBUG",
                         "-DHC",   // 启用HC代码
 //                        "-DJSON_HAS_INT64",  // JsonCpp
                         "-DHAVE_ENDIAN_H"
@@ -32,9 +32,9 @@ android {
             }
 
             ndk {
-                abiFilters "arm64-v8a",
-                           "armeabi-v7a"
-//                           "arm64-v8a"
+//                abiFilters "arm64-v8a",
+//                           "armeabi-v7a"
+              abiFilters  "arm64-v8a"
 //                           "x86",
 //                           "x86_64"
             }
