@@ -118,13 +118,15 @@ JUB_RV ContextETH::SignTransaction(const BIP32_Path& path,
     std::vector<JUB_BYTE> vChainID;
     vChainID.push_back(_chainID);
 
-    bool bERC20 = false;
-    if (0 == memcmp(uchar_vector(vInput).getHex().c_str(), ABI_METHOD_ID_TRANSFER, strlen(ABI_METHOD_ID_TRANSFER))) { // erc20 function sign
-        bERC20 = true;
+    int erc = JUB_ENUM_APDU_ERC_ETH::ERC_INVALID;
+    if (0 == memcmp(uchar_vector(vInput).getHex().c_str(),
+                    ABI_METHOD_ID_TRANSFER, strlen(ABI_METHOD_ID_TRANSFER))
+        ) { // erc20 function sign
+        erc = JUB_ENUM_APDU_ERC_ETH::ERC_20;
     }
 
     uchar_vector raw;
-    JUB_VERIFY_RV(token->SignTXETH(bERC20,
+    JUB_VERIFY_RV(token->SignTXETH(erc,
                                    vNonce,
                                    vGasPriceInWei,
                                    vGasLimit,

@@ -3,7 +3,7 @@
 namespace jub {
 
 
-JUB_RV JubiterBioImpl::SignTXETH(const bool bERC20,
+JUB_RV JubiterBioImpl::SignTXETH(const int erc,
                                  const std::vector<JUB_BYTE>& vNonce,
                                  const std::vector<JUB_BYTE>& vGasPrice,
                                  const std::vector<JUB_BYTE>& vGasLimit,
@@ -14,21 +14,21 @@ JUB_RV JubiterBioImpl::SignTXETH(const bool bERC20,
                                  const std::vector<JUB_BYTE>& vChainID,
                                  std::vector<JUB_BYTE>& vRaw) {
 
-    // Remove subpackage sending APDU.
-//    if (_appletVersion >= stVersionExp::FromString(ETH_APPLET_VERSION_SUPPORT_EXT_TOKENS)) {
-//        return _SignTXUpgradeETH(bERC20,
-//                                 vNonce,
-//                                 vGasPrice,
-//                                 vGasLimit,
-//                                 vTo,
-//                                 vValue,
-//                                 vData,
-//                                 vPath,
-//                                 vChainID,
-//                                 vRaw);
-//    }
-//    else {
-        return _SignTXETH(bERC20,
+    // ETH token extension apdu
+    if (_appletVersion >= stVersionExp::FromString(ETH_APPLET_VERSION_SUPPORT_EXT_TOKENS)) {
+        return _SignTXUpgradeETH(erc,
+                                 vNonce,
+                                 vGasPrice,
+                                 vGasLimit,
+                                 vTo,
+                                 vValue,
+                                 vData,
+                                 vPath,
+                                 vChainID,
+                                 vRaw);
+    }
+    else {
+        return _SignTXETH(erc,
                           vNonce,
                           vGasPrice,
                           vGasLimit,
@@ -38,7 +38,7 @@ JUB_RV JubiterBioImpl::SignTXETH(const bool bERC20,
                           vPath,
                           vChainID,
                           vRaw);
-//    }
+    }
 }
 
 

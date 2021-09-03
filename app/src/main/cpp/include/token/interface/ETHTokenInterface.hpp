@@ -8,6 +8,10 @@
 
 namespace jub {
 
+enum JUB_ENUM_APDU_ERC_ETH : uint16_t {
+    ERC_INVALID = 0,
+    ERC_20   = 0x0014,
+};
 enum JUB_ENUM_APDU_ERC_P1 : uint8_t {
     ERC20  = 0x00,
     ERC721 = 0x01,
@@ -21,7 +25,7 @@ public:
     virtual JUB_RV GetAppletVersionETH(stVersion& version) = 0;
     virtual JUB_RV GetAddressETH(const std::string& path, const JUB_UINT16 tag, std::string& address) = 0;
     virtual JUB_RV GetHDNodeETH(const JUB_BYTE format, const std::string& path, std::string& pubkey) = 0;
-    virtual JUB_RV SignTXETH(const bool bERC20,
+    virtual JUB_RV SignTXETH(const int erc,
                              const std::vector<JUB_BYTE>& vNonce,
                              const std::vector<JUB_BYTE>& vGasPrice,
                              const std::vector<JUB_BYTE>& vGasLimit,

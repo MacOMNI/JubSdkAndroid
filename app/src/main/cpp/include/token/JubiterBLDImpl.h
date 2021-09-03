@@ -150,7 +150,7 @@ public:
     virtual JUB_RV GetAppletVersionETH(stVersion& version) override;
     virtual JUB_RV GetAddressETH(const std::string& path, const JUB_UINT16 tag, std::string& address) override;
     virtual JUB_RV GetHDNodeETH(const JUB_BYTE format, const std::string& path, std::string& pubkey) override;
-    virtual JUB_RV SignTXETH(const bool bERC20,
+    virtual JUB_RV SignTXETH(const int erc,
                              const std::vector<JUB_BYTE>& vNonce,
                              const std::vector<JUB_BYTE>& vGasPrice,
                              const std::vector<JUB_BYTE>& vGasLimit,
@@ -160,7 +160,7 @@ public:
                              const std::vector<JUB_BYTE>& vPath,
                              const std::vector<JUB_BYTE>& vChainID,
                              std::vector<JUB_BYTE>& vRaw) override;
-    virtual JUB_RV _SignTXETH(const bool bERC20,
+    virtual JUB_RV _SignTXETH(const int erc,
                               const std::vector<JUB_BYTE>& vNonce,
                               const std::vector<JUB_BYTE>& vGasPrice,
                               const std::vector<JUB_BYTE>& vGasLimit,
@@ -170,7 +170,7 @@ public:
                               const std::vector<JUB_BYTE>& vPath,
                               const std::vector<JUB_BYTE>& vChainID,
                               std::vector<JUB_BYTE>& vRaw);
-    virtual JUB_RV _SignTXUpgradeETH(const bool bERC20,
+    virtual JUB_RV _SignTXUpgradeETH(const int erc,
                                      const std::vector<JUB_BYTE>& vNonce,
                                      const std::vector<JUB_BYTE>& vGasPrice,
                                      const std::vector<JUB_BYTE>& vGasLimit,

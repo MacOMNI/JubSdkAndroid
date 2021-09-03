@@ -54,7 +54,7 @@ public:
                                      JUB_BYTE fgptID) override;
 
     //ETH functions
-    virtual JUB_RV SignTXETH(const bool bERC20,
+    virtual JUB_RV SignTXETH(const int erc,
                              const std::vector<JUB_BYTE>& vNonce,
                              const std::vector<JUB_BYTE>& vGasPrice,
                              const std::vector<JUB_BYTE>& vGasLimit,
@@ -72,7 +72,7 @@ public:
 
 protected:
     // ERC20 token extension apdu
-    const std::string  ETH_APPLET_VERSION_SUPPORT_EXT_TOKENS= std::string("05050000");  // 5.5.0
+    const std::string  ETH_APPLET_VERSION_SUPPORT_EXT_TOKENS= std::string("05070000");  // 5.7.0
 }; // class JubiterBioImpl end
 
 }  // namespace jub end

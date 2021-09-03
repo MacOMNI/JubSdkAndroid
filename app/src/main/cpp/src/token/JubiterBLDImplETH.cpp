@@ -81,7 +81,7 @@ JUB_RV JubiterBLDImpl::GetHDNodeETH(const JUB_BYTE format, const std::string& pa
 }
 
 
-JUB_RV JubiterBLDImpl::SignTXETH(const bool bERC20,
+JUB_RV JubiterBLDImpl::SignTXETH(const int erc,
                                  const std::vector<JUB_BYTE>& vNonce,
                                  const std::vector<JUB_BYTE>& vGasPrice,
                                  const std::vector<JUB_BYTE>& vGasLimit,
@@ -92,21 +92,21 @@ JUB_RV JubiterBLDImpl::SignTXETH(const bool bERC20,
                                  const std::vector<JUB_BYTE>& vChainID,
                                  std::vector<JUB_BYTE>& vRaw) {
 
-    // Remove subpackage sending APDU.
-//    if (_appletVersion >= stVersionExp::FromString(ETH_APPLET_VERSION_SUPPORT_EXT_TOKENS)) {
-//        return _SignTXUpgradeETH(bERC20,
-//                                 vNonce,
-//                                 vGasPrice,
-//                                 vGasLimit,
-//                                 vTo,
-//                                 vValue,
-//                                 vInput,
-//                                 vPath,
-//                                 vChainID,
-//                                 vRaw);
-//    }
-//    else {
-        return _SignTXETH(bERC20,
+    // ETH token extension apdu
+    if (_appletVersion >= stVersionExp::FromString(ETH_APPLET_VERSION_SUPPORT_EXT_TOKENS)) {
+        return _SignTXUpgradeETH(erc,
+                                 vNonce,
+                                 vGasPrice,
+                                 vGasLimit,
+                                 vTo,
+                                 vValue,
+                                 vInput,
+                                 vPath,
+                                 vChainID,
+                                 vRaw);
+    }
+    else {
+        return _SignTXETH(erc,
                           vNonce,
                           vGasPrice,
                           vGasLimit,
@@ -116,11 +116,11 @@ JUB_RV JubiterBLDImpl::SignTXETH(const bool bERC20,
                           vPath,
                           vChainID,
                           vRaw);
-//    }
+    }
 }
 
 
-JUB_RV JubiterBLDImpl::_SignTXETH(const bool bERC20,
+JUB_RV JubiterBLDImpl::_SignTXETH(const int erc,
                                   const std::vector<JUB_BYTE>& vNonce,
                                   const std::vector<JUB_BYTE>& vGasPrice,
                                   const std::vector<JUB_BYTE>& vGasLimit,
@@ -144,18 +144,34 @@ JUB_RV JubiterBLDImpl::_SignTXETH(const bool bERC20,
     apduData << ToTlv(0x42, vGasPrice);
     apduData << ToTlv(0x43, vGasLimit);
     apduData << ToTlv(0x44, vTo);
-    apduData << ToTlv(0x45, vValue);
+
+    // If value=0, when sending apdu,
+    // it is clear that this part is empty
+    uchar_vector vValueInWei(vValue);
+    if (   1 == vValueInWei.size()
+        && 0 == vValueInWei[0]
+        ) {
+        vValueInWei.clear();
+    }
+    apduData << ToTlv(0x45, vValueInWei);
+
     apduData << ToTlv(0x46, vInput);
     apduData << ToTlv(0x47, vPath);
     apduData << ToTlv(0x48, vChainID);
 
-    JUB_BYTE ins = 0x2a;
-    if (bERC20) {
-        ins = 0xc8;
+    JUB_BYTE ins = 0x2A;
+    JUB_BYTE p1  = JUB_ENUM_APDU_ERC_P1::ERC20;
+    switch (erc) {
+    case JUB_ENUM_APDU_ERC_ETH::ERC_20:
+        ins = 0xC8;
+        break;
+    case JUB_ENUM_APDU_ERC_ETH::ERC_INVALID:
+    default:
+        break;
     }
 
     //one pack can do it
-    APDU apdu(0x00, ins, 0x01, 0x00, (JUB_ULONG)apduData.size(), apduData.data());
+    APDU apdu(0x00, ins, p1, 0x00, (JUB_ULONG)apduData.size(), apduData.data());
     JUB_UINT16 ret = 0;
     JUB_BYTE retData[2048] = {0,};
     JUB_ULONG ulRetDataLen = sizeof(retData)/sizeof(JUB_BYTE);
@@ -171,7 +187,7 @@ JUB_RV JubiterBLDImpl::_SignTXETH(const bool bERC20,
 }
 
 
-JUB_RV JubiterBLDImpl::_SignTXUpgradeETH(const bool bERC20,
+JUB_RV JubiterBLDImpl::_SignTXUpgradeETH(const int erc,
                                          const std::vector<JUB_BYTE>& vNonce,
                                          const std::vector<JUB_BYTE>& vGasPrice,
                                          const std::vector<JUB_BYTE>& vGasLimit,
@@ -196,19 +212,35 @@ JUB_RV JubiterBLDImpl::_SignTXUpgradeETH(const bool bERC20,
     apduData << ToTlv(0x42, vGasPrice);
     apduData << ToTlv(0x43, vGasLimit);
     apduData << ToTlv(0x44, vTo);
-    apduData << ToTlv(0x45, vValue);
+
+    // If value=0, when sending apdu,
+    // it is clear that this part is empty
+    uchar_vector vValueInWei(vValue);
+    if (   1 == vValueInWei.size()
+        && 0 == vValueInWei[0]
+        ) {
+        vValueInWei.clear();
+    }
+    apduData << ToTlv(0x45, vValueInWei);
+
     apduData << ToTlv(0x46, vInput);
     apduData << ToTlv(0x47, vPath);
     apduData << ToTlv(0x48, vChainID);
 
     JUB_BYTE ins = 0x2a;
-    if (bERC20) {
-        ins = 0xc8;
+    JUB_BYTE p1  = JUB_ENUM_APDU_ERC_P1::ERC20;
+    switch (erc) {
+    case JUB_ENUM_APDU_ERC_ETH::ERC_20:
+        p1  = JUB_ENUM_APDU_ERC_P1::ERC20;
+        break;
+    case JUB_ENUM_APDU_ERC_ETH::ERC_INVALID:
+    default:
+        break;
     }
 
+    // subpackage
     {
         constexpr JUB_UINT32 kSendOnceLen = 230;
-
         JUB_ULONG offset = 23;
 
         //  first pack
@@ -242,7 +274,7 @@ JUB_RV JubiterBLDImpl::_SignTXUpgradeETH(const bool bERC20,
     }
 
     //one pack can do it
-    APDU apdu(0x00, ins, 0x01, 0x00, (JUB_ULONG)apduData.size(), apduData.data());
+    APDU apdu(0x00, ins, p1, 0x00, (JUB_ULONG)apduData.size(), apduData.data());
     JUB_UINT16 ret = 0;
     JUB_BYTE retData[2048] = {0,};
     JUB_ULONG ulRetDataLen = sizeof(retData)/sizeof(JUB_BYTE);
