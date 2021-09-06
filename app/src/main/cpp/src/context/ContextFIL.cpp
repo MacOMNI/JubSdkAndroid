@@ -165,7 +165,7 @@ JUB_RV ContextFIL::SignTransaction(const BIP32_Path& path,
     }
 #endif
 
-    strRaw = uchar_vector(tx.serialize(vSignatureRaw[0])).getHex();
+    strRaw = tx.serialize(vSignatureRaw[0]);
 
     return JUBR_OK;
 }
